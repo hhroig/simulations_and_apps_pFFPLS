@@ -5,9 +5,7 @@ output: html_document
 date: "`r Sys.Date()`"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Description
 
@@ -15,7 +13,7 @@ This folder contains all the routines needed for reproducing the simulation stud
 
 Please make sure you install our `R` package `penFoFPLS` from GitHub. You can use the following command:
 
-```{r installation, eval=FALSE}
+```
 devtools::install_github("hhroig/penFoFPLS", dependencies = TRUE)
 ```
 
@@ -30,7 +28,7 @@ Using `simulation_study_pFFPLS/` as working directory:
 
 2. Make sure to comment/un-comment the setting you wish to run:
 
-```{r set1, eval=FALSE}
+```
 # Setting 1:
 LL <- 5 # number of basis for Y(q)
 KK <- 7 # number of basis for X(p)
