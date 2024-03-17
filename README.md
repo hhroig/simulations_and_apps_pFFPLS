@@ -1,13 +1,10 @@
----
-title: "Penalized function-on-function partial least-squares regression"
-subtitle: "Routines for simulation study and real-data applications"
-output: html_document
-date: "`r Sys.Date()`"
----
+# "Penalized function-on-function partial least-squares regression"
+
+## "Routines for simulation study and real-data applications"
 
 
 
-## Description
+### Description
 
 This folder contains all the routines needed for reproducing the simulation study and real data applications described in the article: "Penalized function-on-function partial least-squares regression."
 
@@ -20,7 +17,7 @@ devtools::install_github("hhroig/penFoFPLS", dependencies = TRUE)
 Also, make sure you install all the needed packages (all available in CRAN). The routines are designed to run in parallel. All the results and graphical summaries will be generated and saved into a new folder.
 
 
-## Simulation study
+### Simulation study
 
 Using `simulation_study_pFFPLS/` as working directory:
 
@@ -44,7 +41,7 @@ KK <- 40 # number of basis for X(p)
 ```
 
 
-## Application: Canada weather data
+### Application: Canada weather data
 
 Using `application_Canada_weather_pFFPLS/` as working directory:
 
@@ -54,7 +51,7 @@ Using `application_Canada_weather_pFFPLS/` as working directory:
 
 
 
-## Application: gait cycle data
+### Application: gait cycle data
 
 Using `application_gait_data_pFFPLS/` as working directory:
 
