@@ -1,6 +1,6 @@
-# "Penalized function-on-function partial least-squares regression"
+# Penalized function-on-function partial least-squares regression
 
-## "Routines for simulation study and real-data applications"
+## Routines for simulation study and real-data applications
 
 
 
