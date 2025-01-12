@@ -99,7 +99,7 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  30
+total_reps  <-  3
 rep_starts <- 1
 
 # number of PLS components to compute:

@@ -281,7 +281,20 @@ for(beta.num in num_betas)       {
       
       ## NonPenalized model ----
       
-      m_final <- cv_nonpen[["final_model"]]
+      m_final <- ffpls_bs(X = X,
+                          Y = Y,
+                          argvals_X = argvals_X,
+                          argvals_Y = argvals_Y,
+                          ncomp = nComp,
+                          center = center,
+                          basisobj_X = basisobj_X,
+                          basisobj_Y = basisobj_Y,
+                          penalty_X = 0,
+                          penalty_Y = 0,
+                          verbose = FALSE,
+                          stripped = F,
+                          maxit = 100000)
+      
       beta_hat <- m_final$coefficient_function[, , nComp]
       
       beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
@@ -319,7 +332,19 @@ for(beta.num in num_betas)       {
       
       if (do_opt_bases_FFPLS) {
         
-        m_final <- cv_nonpen_bases[["final_model"]]
+        m_final <- ffpls_bs(X = X,
+                            Y = Y,
+                            argvals_X = argvals_X,
+                            argvals_Y = argvals_Y,
+                            ncomp = nComp,
+                            center = center,
+                            basisobj_X = cv_nonpen_bases$best_num_bases[nComp, "numbases_X"],
+                            basisobj_Y = cv_nonpen_bases$best_num_bases[nComp, "numbases_Y"],
+                            penalty_X = 0,
+                            penalty_Y = 0,
+                            verbose = FALSE,
+                            stripped = F,
+                            maxit = 100000)
         beta_hat <- m_final$coefficient_function[, , nComp]
         
         beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
