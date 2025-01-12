@@ -6,6 +6,8 @@ library(dplyr)
 library(penFoFPLS)
 library(fda)
 
+do_setting <- 3 # settings 1, 2, or 3
+
 # Settings ----------------------------------------------------------------
 
 mean_imse_by_row <- function(func_true,
@@ -42,7 +44,7 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 100
+num_lambdas <- 10
 lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
@@ -60,25 +62,33 @@ argvals_Y <- seq(0, 1, length.out = nnodesY) # q
 # Number of basis:
 
 # # Setting 1:
-# LL <- 5 # number of basis for Y(q)
-# KK <- 5 # number of basis for X(p)
-# do_opt_bases_FFPLS = FALSE
+if (do_setting == 1) {
+  LL <- 5 # number of basis for Y(q)
+  KK <- 5 # number of basis for X(p)
+  do_opt_bases_FFPLS = FALSE
+}
+
 
 # # Setting 2: 
-# LL <- 40 # number of basis for Y(q)
-# KK <- 40 # number of basis for X(p)
-# do_opt_bases_FFPLS = FALSE
+if (do_setting == 2) {
+  LL <- 40 # number of basis for Y(q)
+  KK <- 40 # number of basis for X(p)
+  do_opt_bases_FFPLS = FALSE
+}
+
 
 # # Setting 3: 
 # # select number of basis using CVE for non-penalized method
 # # use the following for the penalized approach:
-LL <- 40 # number of basis for Y(q)
-KK <- 40 # number of basis for X(p)
+if (do_setting == 3) {
+  LL <- 40 # number of basis for Y(q)
+  KK <- 40 # number of basis for X(p)
+  
+  LL_list <- round(seq(5, 40, length.out = num_lambdas)) # list of number of bases for Y(q)
+  KK_list <- LL_list                                     # list of number of bases for X(p)
+  do_opt_bases_FFPLS = TRUE
+}
 
-
-LL_list <- round(seq(5, 40, length.out = num_lambdas)) # list of number of bases for Y(q)
-KK_list <- LL_list                                     # list of number of bases for X(p)
-do_opt_bases_FFPLS = TRUE
 
 
 # B-spline basis:
@@ -100,7 +110,8 @@ num_folds <- 5
 
 
 # output folder:
-out_folder <- paste0("results_reps_", 
+out_folder <- paste0("setting_", do_setting,
+                     "_reps_", 
                      total_reps, 
                      "_pen_", 
                      length(penaltyvec_X)*length(penaltyvec_Y),
