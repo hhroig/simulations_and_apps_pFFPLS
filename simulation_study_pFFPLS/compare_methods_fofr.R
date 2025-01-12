@@ -16,7 +16,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   ## Final Models Files  ---------------------------------------------------
   
-  
+  # IMSE for Beta and validation Y:
   all_final_res <- data.frame()
   
   final_res_files <- list.files(path = input_folder, pattern = "final_models")
@@ -30,17 +30,62 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     
   }
   
-  
-  # CVEs files:
-  
+  # CVEs:
   all_cves <- data.frame()
   
-  all_cves_files <- list.files(path = input_folder, pattern = "cves_")
+  all_cves_files <- list.files(path = input_folder, pattern = "cves_rep")
   
   for (ind_file in all_cves_files) {
     
     all_cves <- rbind(
       all_cves,
+      readRDS(paste0(input_folder, ind_file))
+    )
+    
+  }
+  
+  # Computation time
+  all_computation_times <- data.frame()
+  
+  all_computation_times_files <- list.files(path = input_folder, pattern = "computation_times")
+  
+  for (ind_file in all_computation_times_files) {
+    
+    all_computation_times <- rbind(
+      all_computation_times,
+      readRDS(paste0(input_folder, ind_file))
+    )
+    
+  }
+  
+  
+  # Best number bases for FFPLS:
+  
+  all_best_num_bases_FFPLS <- data.frame()
+  
+  all_best_num_bases_FFPLS_files <- list.files(path = input_folder, pattern = "best_num_bases_FFPLS")
+  
+  for (ind_file in all_best_num_bases_FFPLS_files) {
+    
+    all_best_num_bases_FFPLS <- rbind(
+      all_best_num_bases_FFPLS,
+      readRDS(paste0(input_folder, ind_file))
+    )
+    
+  }
+  
+  
+  
+  # Best number bases for FFPLS:
+  
+  all_best_num_bases_FFPLS <- data.frame()
+  
+  all_best_num_bases_FFPLS_files <- list.files(path = input_folder, pattern = "best_num_bases_FFPLS")
+  
+  for (ind_file in all_best_num_bases_FFPLS_files) {
+    
+    all_best_num_bases_FFPLS <- rbind(
+      all_best_num_bases_FFPLS,
       readRDS(paste0(input_folder, ind_file))
     )
     
@@ -84,6 +129,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       method = case_when(
         method == "Penalized" ~ "pFFPLS",
         method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
         .default = method
       )
     )
@@ -94,6 +140,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       method = case_when(
         method == "Penalized" ~ "pFFPLS",
         method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
         .default = method
       )
     )
@@ -104,6 +151,18 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       method = case_when(
         method == "Penalized" ~ "pFFPLS",
         method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
+        .default = method
+      )
+    )
+  
+  all_computation_times <- all_computation_times %>%
+    mutate(nComp = as.factor(nComp)) %>% 
+    mutate(
+      method = case_when(
+        method == "Penalized" ~ "pFFPLS",
+        method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
         .default = method
       )
     )
@@ -115,6 +174,19 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       method = case_when(
         method == "Penalized" ~ "pFFPLS",
         method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
+        .default = method
+      )
+    )
+  
+  
+  all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
+    mutate(nComp = as.factor(nComp)) %>% 
+    mutate(
+      method = case_when(
+        method == "Penalized" ~ "pFFPLS",
+        method == "NonPenalized" ~ "FFPLS",
+        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_opt_bases",
         .default = method
       )
     )
@@ -122,23 +194,15 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   # Limits:
   
-  cve_limits <- range(all_cves$CVE)
-  imse_limits <- range(all_final_res$imse )
+  # cve_limits <- range(all_cves$CVE)
+  # imse_limits <- range(all_final_res$imse )
+  # mean_imse_Y_val_limits <- range(all_final_res$mean_imse_Y_val )
   
   
   # IMSE + MSE --------------------------------------------------------------
   
-  all_cves <- all_cves %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "NonPenalized" ~ "FFPLS",
-        .default = method
-      )
-    )
-  
-  
   color_codes <- c("pFFPLS" = hue_pal()(3)[3],
+                   "FFPLS_opt_bases" = hue_pal()(3)[2],
                    "FFPLS" = hue_pal()(3)[1])
   
   
@@ -147,7 +211,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     p_cve <- ggplot(all_cves %>% filter(beta.num == beta_num),
                     aes(x = nComp, y = CVE, fill = method)) +
       geom_boxplot(position=position_dodge(0.8))  +
-      ylab("CVE(Y)") +
+      ylab("Training: CVE(Y)") +
       xlab("# of components") +
       scale_fill_manual(values = color_codes)+
       theme_bw()  +
@@ -163,21 +227,32 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       theme_bw() +
       theme(legend.position="none", text = element_text(size = 20))
     
+    p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num),
+                     aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8)) +
+      ylab( expression( "Validation: IMSE(Y)" )  ) +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes) +
+      theme_bw() +
+      theme(legend.position="none", text = element_text(size = 20))
+    
+    
     # get legend
     leg <- get_legend(p_cve)
     # remove from last plot
     p_cve <- p_cve + theme(legend.position="none")
+    p_imse_val <- p_imse_val + theme(legend.position="none")
     
-    p_both <- grid.arrange(p_cve, p_imse, nrow = 1, bottom = leg)
+    p_both <- grid.arrange(p_cve, p_imse_val, p_imse, nrow = 1, bottom = leg)
     
     ggsave(p_both,
            filename = paste0(out_folder,
                              paste0("imseY_imseBeta_", beta_num,".png")  ),
-           width = 12, height = 6 )
+           width = 15, height = 6 )
     ggsave(p_both,
            filename = paste0(out_folder,
                              paste0("imseY_imseBeta_", beta_num,".pdf")  ),
-           width = 12, height = 6 )
+           width = 15, height = 6 )
     
     
     
@@ -185,7 +260,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     p_cve_log <- ggplot(all_cves %>% filter( beta.num == beta_num),
                         aes(x = nComp, y = log(CVE, base = 10), fill = method)) +
       geom_boxplot(position=position_dodge(0.8))  +
-      ylab("log{ CVE(Y) }") +
+      ylab("Training: log{ CVE(Y) }") +
       xlab("# of components") +
       scale_fill_manual(values = color_codes)+
       theme_bw()  +
@@ -201,24 +276,33 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       theme_bw() +
       theme(legend.position="none", text = element_text(size = 20))
     
+    p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num),
+                         aes(x = nComp, y = log(mean_imse_Y_val, base = 10), fill = method)) +
+      geom_boxplot( position=position_dodge(0.8) ) +
+      ylab(expression( "Validation: log { IMSE(Y) }" ) ) +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes) +
+      theme_bw() +
+      theme(legend.position="none", text = element_text(size = 20))
+    
     # get legend
     leg <- get_legend(p_cve_log)
     # remove from last plot
     p_cve_log <- p_cve_log + theme(legend.position="none")
+    p_imse_val_log <- p_imse_val_log + theme(legend.position="none")
     
-    
-    p_both_log <- grid.arrange(p_cve_log, p_imse_log, nrow = 1, bottom = leg)
+    p_both_log <- grid.arrange(p_cve_log, p_imse_val_log, p_imse_log, nrow = 1, bottom = leg)
     
     ggsave(p_both_log,
            filename = paste0(out_folder,
                              paste0("imseY_imseBeta_log_", beta_num,
                                     ".pdf")  ),
-           width = 12, height = 6 )
+           width = 15, height = 6 )
     ggsave(p_both_log,
            filename = paste0(out_folder,
                              paste0("imseY_imseBeta_log_", beta_num,
                                     ".png")  ),
-           width = 12, height = 6 )
+           width = 15, height = 6 )
     
     
     
@@ -227,6 +311,58 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   
   
+  
+  # Computation time --------------------------------------------------------------
+  
+  color_codes <- c("pFFPLS" = hue_pal()(3)[3],
+                   "FFPLS_opt_bases" = hue_pal()(3)[2],
+                   "FFPLS" = hue_pal()(3)[1])
+  
+  
+  for (beta_num in unique(all_computation_times$beta.num)) {
+    
+    p_elapsed <- ggplot(all_computation_times %>% filter(beta.num == beta_num),
+                    aes(x = nComp, y = elapsed_time, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8))  +
+      ylab("Cross-Validation Time") +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes)+
+      theme_bw()  +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    p_elapsed_log <- ggplot(all_computation_times %>% filter(beta.num == beta_num),
+                        aes(x = nComp, y = log(elapsed_time, base = 10), fill = method)) +
+      geom_boxplot(position=position_dodge(0.8))  +
+      ylab("Cross-Validation Time (log-scale)") +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes)+
+      theme_bw()  +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    
+    ggsave(p_elapsed,
+           filename = paste0(out_folder,
+                             paste0("computaion_times_", beta_num,".png")  ),
+           width = 6, height = 6 )
+    ggsave(p_elapsed,
+           filename = paste0(out_folder,
+                             paste0("computaion_times_", beta_num,".pdf")  ),
+           width = 6, height = 6 )
+    
+    
+    ggsave(p_elapsed_log,
+           filename = paste0(out_folder,
+                             paste0("computaion_times_log_", beta_num,".png")  ),
+           width = 6, height = 6 )
+    ggsave(p_elapsed_log,
+           filename = paste0(out_folder,
+                             paste0("computaion_times_log_", beta_num,".pdf")  ),
+           width = 6, height = 6 )
+    
+    
+  } # loop "beta.num"
   
   
   
@@ -275,6 +411,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   summ_all_betas <- all_betas %>%
     as_tibble() %>%
     mutate(method = factor(method, levels = c("FFPLS",
+                                              "FFPLS_opt_bases",
                                               "pFFPLS",
                                               "True Beta") )) %>%
     dplyr::select(-z_true) %>% 
@@ -384,6 +521,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   summ_all_betas <- all_betas %>%
     as_tibble() %>%
     mutate(method = factor(method, levels = c("FFPLS",
+                                              "FFPLS_opt_bases",
                                               "pFFPLS",
                                               "True Beta") )) %>%
     dplyr::select(-z_true) %>% 
