@@ -1,10 +1,9 @@
 # For internal use and sharing:
-shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
+# shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
 
 
 # Leave blank if you want to save in the working directory:
-# shared_folder = ""
-
+shared_folder = ""
 
 
 
@@ -121,7 +120,7 @@ verbose <- TRUE
 stripped <- F
 
 rep_starts <- 1
-total_reps <- 3
+total_reps <- 30
 
 
 # output folder:
@@ -184,20 +183,21 @@ for(rep_num in rep_starts:total_reps)  {
   
   
   # Train-test / validation --------------------------------------------------------------
-  train_index <- sample(1:nrow(X_orig), 9, replace = FALSE)
+  val_index <- sample(1:nrow(X_orig), 9, replace = FALSE)
   
-  Y_val = Y_orig[-train_index, ]
-  X_val = X_orig[-train_index, ]
+  Y_val = Y_orig[val_index, ]
+  X_val = X_orig[val_index, ]
   
   
-  Y = Y_orig[train_index, ]
-  X = X_orig[train_index, ]
+  Y = Y_orig[-val_index, ]
+  X = X_orig[-val_index, ]
   
   
   folds <- caret::createFolds(1:nrow(Y), k = num_folds)
   
   # Initialize savings:
   all_CVEs <- data.frame()
+  best_num_bases <- data.frame()
   all_beta_hats <- data.frame()
   all_final_res <- data.frame()
   best_lambdas <- data.frame()
@@ -213,23 +213,23 @@ for(rep_num in rep_starts:total_reps)  {
   doParallel::registerDoParallel(cl)
   
   cv_penalized_Fourier <- cv_unique_fof_par(X = X,
-                                               Y = Y,
-                                               argvals_X = argvals_X,
-                                               argvals_Y = argvals_Y,
-                                               ncomp = max_nComp,
-                                               center = center,
-                                               folds = folds,
-                                               basisobj_X = basisobj_X,
-                                               basisobj_Y = basisobj_Y,
-                                               penaltyvec_X = penaltyvec_X,
-                                               penaltyvec_Y = penaltyvec_Y,
-                                               verbose = verbose,
-                                               stripped = stripped,
-                                               RPhi = RPhi,
-                                               RPsi = RPsi,
-                                               PX = PX,
-                                               PY = PY,
-                                               maxit = 100000  )
+                                            Y = Y,
+                                            argvals_X = argvals_X,
+                                            argvals_Y = argvals_Y,
+                                            ncomp = max_nComp,
+                                            center = center,
+                                            folds = folds,
+                                            basisobj_X = basisobj_X,
+                                            basisobj_Y = basisobj_Y,
+                                            penaltyvec_X = penaltyvec_X,
+                                            penaltyvec_Y = penaltyvec_Y,
+                                            verbose = verbose,
+                                            stripped = stripped,
+                                            RPhi = RPhi,
+                                            RPsi = RPsi,
+                                            PX = PX,
+                                            PY = PY,
+                                            maxit = 100000  )
   
   
   parallel::stopCluster(cl)
@@ -265,23 +265,23 @@ for(rep_num in rep_starts:total_reps)  {
   doParallel::registerDoParallel(cl)
   
   cv_nonpen_Fourier <- cv_unique_fof_par(X = X,
-                                            Y = Y,
-                                            argvals_X = argvals_X,
-                                            argvals_Y = argvals_Y,
-                                            ncomp = max_nComp,
-                                            center = center,
-                                            folds = folds,
-                                            basisobj_X = basisobj_X,
-                                            basisobj_Y = basisobj_Y,
-                                            penaltyvec_X = 0,
-                                            penaltyvec_Y = 0,
-                                            verbose = verbose,
-                                            stripped = stripped,
-                                            RPhi = RPhi,
-                                            RPsi = RPsi,
-                                            PX = PX,
-                                            PY = PY,
-                                            maxit = 100000  )
+                                         Y = Y,
+                                         argvals_X = argvals_X,
+                                         argvals_Y = argvals_Y,
+                                         ncomp = max_nComp,
+                                         center = center,
+                                         folds = folds,
+                                         basisobj_X = basisobj_X,
+                                         basisobj_Y = basisobj_Y,
+                                         penaltyvec_X = 0,
+                                         penaltyvec_Y = 0,
+                                         verbose = verbose,
+                                         stripped = stripped,
+                                         RPhi = RPhi,
+                                         RPsi = RPsi,
+                                         PX = PX,
+                                         PY = PY,
+                                         maxit = 100000  )
   
   
   parallel::stopCluster(cl)
@@ -335,6 +335,15 @@ for(rep_num in rep_starts:total_reps)  {
   
   cat("    -> non-penalized Fourier model done\n")
   
+  
+  
+  best_num_bases <- rbind(
+    best_num_bases,
+    data.frame(num_bases = cv_nonpen_bases$best_num_bases,
+               method = "FFPLS_opt_bases",
+               nComp = 1:max_nComp,
+               rep_num = rep_num)
+  )
   
   all_CVEs <- rbind(
     all_CVEs,
@@ -526,13 +535,19 @@ for(rep_num in rep_starts:total_reps)  {
   
   saveRDS(all_final_res, file =
             paste0(out_folder,
-                   "mean_imse_Y_rep_",
+                   "imse_Y_validation_rep_",
                    rep_num,
                    ".Rds"))
   
   saveRDS(all_beta_hats, file =
             paste0(out_folder,
                    "betas_rep_",
+                   rep_num,
+                   ".Rds"))
+  
+  saveRDS(best_num_bases, file =
+            paste0(out_folder,
+                   "best_num_bases_ffpls_rep_",
                    rep_num,
                    ".Rds"))
   
@@ -549,6 +564,6 @@ for(rep_num in rep_starts:total_reps)  {
 
 # Run comparisons ---------------------------------------------------------
 
-# source("compare_methods_app.R", local = TRUE)
-# 
-# compare_methods_app(out_folder)
+source("compare_methods_app.R", local = TRUE)
+
+compare_methods_app(out_folder)
