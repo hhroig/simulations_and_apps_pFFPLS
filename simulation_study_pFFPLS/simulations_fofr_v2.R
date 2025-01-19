@@ -332,19 +332,26 @@ for(beta.num in num_betas)       {
       
       if (do_opt_bases_FFPLS) {
         
+        # B-spline basis:
+        basisobj_X_best <- fda::create.bspline.basis(rangeval = range(argvals_X),
+                                                nbasis = cv_nonpen_bases$best_num_bases[nComp, "numbases_X"])
+        basisobj_Y_best <- fda::create.bspline.basis(rangeval = range(argvals_Y),
+                                                nbasis = cv_nonpen_bases$best_num_bases[nComp, "numbases_Y"])
+        
         m_final <- ffpls_bs(X = X,
                             Y = Y,
                             argvals_X = argvals_X,
                             argvals_Y = argvals_Y,
                             ncomp = nComp,
                             center = center,
-                            basisobj_X = cv_nonpen_bases$best_num_bases[nComp, "numbases_X"],
-                            basisobj_Y = cv_nonpen_bases$best_num_bases[nComp, "numbases_Y"],
+                            basisobj_X = basisobj_X_best,
+                            basisobj_Y = basisobj_Y_best,
                             penalty_X = 0,
                             penalty_Y = 0,
                             verbose = FALSE,
                             stripped = F,
                             maxit = 100000)
+        
         beta_hat <- m_final$coefficient_function[, , nComp]
         
         beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
