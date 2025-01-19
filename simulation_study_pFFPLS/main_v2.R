@@ -1,3 +1,12 @@
+
+# For internal use and sharing:
+shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
+
+
+# Leave blank if you want to save in the working directory:
+# shared_folder = ""
+
+
 # Please install the R package "penFoFPLS" from GitHub:
 # devtools::install_github("hhroig/penFoFPLS", dependencies = TRUE)
 
@@ -99,7 +108,7 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  3
+total_reps  <-  100
 rep_starts <- 1
 
 # number of PLS components to compute:
@@ -110,7 +119,15 @@ num_folds <- 5
 
 
 # output folder:
-out_folder <- paste0("setting_", do_setting,
+if (!dir.exists( paste0(shared_folder, "results_simulations/")) ) {
+  dir.create( paste0(shared_folder, "results_simulations/") ) 
+}
+
+
+# output folder:
+out_folder <- paste0(shared_folder,
+                     "results_simulations/",
+                     "setting_", do_setting,
                      "_reps_", 
                      total_reps, 
                      "_pen_", 

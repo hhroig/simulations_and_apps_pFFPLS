@@ -1,9 +1,9 @@
 # For internal use and sharing:
-# shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
+shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
 
 
 # Leave blank if you want to save in the working directory:
-shared_folder = ""
+# shared_folder = ""
 
 
 
@@ -120,17 +120,17 @@ verbose <- TRUE
 stripped <- F
 
 rep_starts <- 1
-total_reps <- 30
+total_reps <- 100
 
 
 # output folder:
-if (!dir.exists( paste0(shared_folder, "results/")) ) {
-  dir.create( paste0(shared_folder, "results/") ) 
+if (!dir.exists( paste0(shared_folder, "results_gait_app/")) ) {
+  dir.create( paste0(shared_folder, "results_gait_app/") ) 
 }
 
 out_folder <- paste0( 
   shared_folder,
-  "results/reps_", total_reps,
+  "results_gait_app/reps_", total_reps,
   "_ymd_",
   format(Sys.Date(), "%Y_%m_%d"),
   "_hm_",

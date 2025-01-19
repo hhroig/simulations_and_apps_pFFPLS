@@ -204,6 +204,33 @@ cv_BS <- cv_unique_fof_par(X = X,
 
 m_final <- cv_BS$final_model
 
+
+
+
+cv_nonpen_bases <- cv_bases_fof_par(X = X,
+                                    Y = Y,
+                                    argvals_X = argvals_X,
+                                    argvals_Y = argvals_Y,
+                                    ncomp = max_nComp,
+                                    center = center,
+                                    folds = folds,
+                                    
+                                    num_bases_X = KK_list,
+                                    num_bases_Y = LL_list,
+                                    fda_basis_func_X = fda::create.fourier.basis,
+                                    fda_basis_func_Y = fda::create.fourier.basis,
+                                    penalty_X = 0,
+                                    penalty_Y = 0,
+                                    
+                                    harmaccelLfd_X = harmaccelLfd_X,
+                                    harmaccelLfd_Y = harmaccelLfd_Y,
+                                    
+                                    verbose = TRUE,
+                                    stripped = FALSE,
+                                    maxit = 100000 )
+
+
+
 parallel::stopCluster(cl)
 rm(cl)
 
