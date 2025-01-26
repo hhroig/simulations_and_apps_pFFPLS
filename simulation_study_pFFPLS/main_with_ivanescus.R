@@ -14,6 +14,8 @@ library(pls)
 library(dplyr)
 library(penFoFPLS)
 library(fda)
+library(refund)
+library(reshape2)
 
 do_setting <- 3 # settings 1, 2, or 3
 
@@ -53,7 +55,7 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 10
+num_lambdas <- 2
 lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
@@ -108,7 +110,7 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  2
+total_reps  <-  3
 rep_starts <- 1
 
 # number of PLS components to compute:
@@ -149,7 +151,7 @@ nodes_CL = detectCores()   # Detect number of cores to use
 cl = makeCluster(nodes_CL) # Specify number of threads here
 registerDoParallel(cl)
 
-source("simulations_fofr_v2.R", local = TRUE)
+source("simulations_fofr_v2_with_ivanescus.R", local = TRUE)
 
 stopCluster(cl)
 
