@@ -1,4 +1,4 @@
-results_simulations/
+simulation_study_pFFPLS/results_*
 .Rproj.user
 .Rhistory
 .RData
