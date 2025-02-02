@@ -31,6 +31,26 @@ redo_beta_true <- function(q, p, nbeta) {
 }
 
 
+
+# R2 function on q --------------------------------------
+
+R_sqr_function <- function(y_true, y_pred) {
+  
+  y_mean <- colMeans(y_true)
+  
+  SST <- colMeans((y_true - y_mean)^2)
+  SSR <- colMeans((y_true - y_pred)^2)  
+  
+  R2 <- 1 - SSR/SST
+  
+  return(R2)
+  
+  
+}
+
+
+
+
 # Repetitions -------------------------------------------------------------
 
 
@@ -44,6 +64,7 @@ for(beta.num in num_betas)       {
     all_val_MSEs <- data.frame()
     all_beta_hats <- data.frame()
     all_final_res <- data.frame()
+    all_r2s <- data.frame()
     best_lambdas <- data.frame()
     computation_times <- data.frame()  
     
@@ -78,10 +99,9 @@ for(beta.num in num_betas)       {
     
     cat("    -> starting Ivanescu's pffr\n")
     
+    data_pffr <- list(X = X, Y = Y, argvals_X = argvals_X, argvals_Y = argvals_Y)
+    
     time_pffr <- system.time({  # Measure time
-      
-      
-      data_pffr <- list(X = X, Y = Y, argvals_X = argvals_X, argvals_Y = argvals_Y)
       
       m_final_pffr <- pffr(
         Y ~ 0 + ff(X, xind=argvals_X), 
@@ -345,7 +365,25 @@ for(beta.num in num_betas)       {
                                method = "pFFPLS")
       )
       
-      rm(m_final, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
+      
+      
+      
+      # Compute R2 for the training and validation sets:
+      y_pred <- fitted.values(m_final)[ , , nComp]
+      y_val_pred <- predict(object = m_final, newdata = X_val)[, , nComp]
+      
+      all_r2s <- rbind(all_r2s,
+                       tibble(
+                         r2_train = R_sqr_function(Y, y_pred),
+                         r2_val = R_sqr_function(Y_val, y_val_pred),
+                         nComp = nComp,
+                         beta.num = beta.num,
+                         rep_num = rep_num,
+                         method = "pFFPLS")
+      )
+      
+      
+      rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
       
       
       ## NonPenalized model ----
@@ -394,7 +432,23 @@ for(beta.num in num_betas)       {
                                method = "FFPLS")
       )
       
-      rm(m_final, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
+      
+      # Compute R2 for the training and validation sets:
+      y_pred <- fitted.values(m_final)[ , , nComp]
+      y_val_pred <- predict(object = m_final, newdata = X_val)[, , nComp]
+      
+      all_r2s <- rbind(all_r2s,
+                       tibble(
+                         r2_train = R_sqr_function(Y, y_pred),
+                         r2_val = R_sqr_function(Y_val, y_val_pred),
+                         nComp = nComp,
+                         beta.num = beta.num,
+                         rep_num = rep_num,
+                         method = "FFPLS")
+      )
+      
+      
+      rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
       
       
       ## NonPenalized model after num bases opt. ----
@@ -451,7 +505,23 @@ for(beta.num in num_betas)       {
                                  method = "FFPLS_opt_bases")
         )
         
-        rm(m_final, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
+        
+        # Compute R2 for the training and validation sets:
+        y_pred <- fitted.values(m_final)[ , , nComp]
+        y_val_pred <- predict(object = m_final, newdata = X_val)[, , nComp]
+        
+        all_r2s <- rbind(all_r2s,
+                         tibble(
+                           r2_train = R_sqr_function(Y, y_pred),
+                           r2_val = R_sqr_function(Y_val, y_val_pred),
+                           nComp = nComp,
+                           beta.num = beta.num,
+                           rep_num = rep_num,
+                           method = "FFPLS_opt_bases")
+        )
+        
+        
+        rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
         
       }
       
@@ -494,6 +564,23 @@ for(beta.num in num_betas)       {
       )
       
       
+      
+      # Compute R2 for the training and validation sets:
+      y_pred <- predict(m_final_pffr)
+      y_val_pred <- predict(m_final_pffr, newdata = list(X = X_val))
+      
+      all_r2s <- rbind(all_r2s,
+                       tibble(
+                         r2_train = R_sqr_function(Y, y_pred),
+                         r2_val = R_sqr_function(Y_val, y_val_pred),
+                         nComp = nComp,
+                         beta.num = beta.num,
+                         rep_num = rep_num,
+                         method = "pffr")
+      )
+      
+      
+      rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) 
       rm(beta_hat, beta_df, mean_imse_Y_val) # I'll reuse the same model name
     
     }  # end nComp loop
@@ -543,6 +630,14 @@ for(beta.num in num_betas)       {
     
     
     saveRDS(computation_times, file =
+              paste0(out_folder,
+                     "R2s_rep_",
+                     rep_num,
+                     "_beta_",
+                     beta.num,
+                     ".Rds"))
+    
+    saveRDS(all_r2s, file =
               paste0(out_folder,
                      "computation_times_rep_",
                      rep_num,

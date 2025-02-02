@@ -55,7 +55,7 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 30
+num_lambdas <- 3
 lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
@@ -110,11 +110,11 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  30
+total_reps  <-  3
 rep_starts <- 1
 
 # number of PLS components to compute:
-max_nComp <- 8
+max_nComp <- 3
 
 # number K of folds to do cross-validation:
 num_folds <- 5
@@ -124,20 +124,6 @@ num_folds <- 5
 if (!dir.exists( paste0(shared_folder, "results_simulations/")) ) {
   dir.create( paste0(shared_folder, "results_simulations/") ) 
 }
-
-
-# output folder:
-# out_folder <- paste0(shared_folde
-#                      "results_simulations/",
-#                      "setting_", do_setting,
-#                      "_reps_", 
-#                      total_reps, 
-#                      "_pen_", 
-#                      length(penaltyvec_X)*length(penaltyvec_Y),
-#                      "_K_", KK, "_L_", LL,
-#                      "_optFFPLS_", do_opt_bases_FFPLS,
-#                      "_center_", center,
-#                      "/")
 
 out_folder <- paste0(shared_folder,
                      "results_simulations/",
