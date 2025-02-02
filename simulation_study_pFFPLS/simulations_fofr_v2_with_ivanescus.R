@@ -374,8 +374,8 @@ for(beta.num in num_betas)       {
       
       all_r2s <- rbind(all_r2s,
                        tibble(
-                         r2_train = R_sqr_function(Y, y_pred),
-                         r2_val = R_sqr_function(Y_val, y_val_pred),
+                         R2_train = R_sqr_function(Y, y_pred),
+                         R2_val = R_sqr_function(Y_val, y_val_pred),
                          q = argvals_Y,
                          nComp = nComp,
                          beta.num = beta.num,
@@ -440,8 +440,8 @@ for(beta.num in num_betas)       {
       
       all_r2s <- rbind(all_r2s,
                        tibble(
-                         r2_train = R_sqr_function(Y, y_pred),
-                         r2_val = R_sqr_function(Y_val, y_val_pred),
+                         R2_train = R_sqr_function(Y, y_pred),
+                         R2_val = R_sqr_function(Y_val, y_val_pred),
                          q = argvals_Y,
                          nComp = nComp,
                          beta.num = beta.num,
@@ -514,8 +514,8 @@ for(beta.num in num_betas)       {
         
         all_r2s <- rbind(all_r2s,
                          tibble(
-                           r2_train = R_sqr_function(Y, y_pred),
-                           r2_val = R_sqr_function(Y_val, y_val_pred),
+                           R2_train = R_sqr_function(Y, y_pred),
+                           R2_val = R_sqr_function(Y_val, y_val_pred),
                            q = argvals_Y,
                            nComp = nComp,
                            beta.num = beta.num,
@@ -574,9 +574,9 @@ for(beta.num in num_betas)       {
       
       all_r2s <- rbind(all_r2s,
                        tibble(
-                         r2_train = R_sqr_function(Y, y_pred),
-                         r2_val = R_sqr_function(Y_val, y_val_pred),
-                         q = beta_hat$y,
+                         R2_train = R_sqr_function(Y, y_pred),
+                         R2_val = R_sqr_function(Y_val, y_val_pred),
+                         q = argvals_Y,
                          nComp = nComp,
                          beta.num = beta.num,
                          rep_num = rep_num,

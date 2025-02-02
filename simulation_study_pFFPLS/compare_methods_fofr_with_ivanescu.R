@@ -253,7 +253,8 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="none", text = element_text(size = 20))
+      theme(legend.position="none", text = element_text(size = 20))+
+      labs(fill = "")
     
     p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                          aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
@@ -262,7 +263,8 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="bottom", text = element_text(size = 20))
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
     
     
     # get legend
@@ -274,12 +276,12 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     
     ggsave(p_both,
            filename = paste0(out_folder,
-                             paste0("imseY_imseBeta_", beta_num,".png")  ),
-           width = 15, height = 6 )
+                             paste0("train_cveY_val_imseY_imseBeta", beta_num,".png")  ),
+           width = 16, height = 8 )
     ggsave(p_both,
            filename = paste0(out_folder,
-                             paste0("imseY_imseBeta_", beta_num,".pdf")  ),
-           width = 15, height = 6 )
+                             paste0("train_cveY_val_imseY_imseBeta", beta_num,".pdf")  ),
+           width = 16, height = 8 )
     
     
     
@@ -301,7 +303,8 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="none", text = element_text(size = 20))
+      theme(legend.position="none", text = element_text(size = 20))+
+      labs(fill = "")
     
     p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                              aes(x = nComp, y = log(mean_imse_Y_val, base = 10), fill = method)) +
@@ -310,7 +313,8 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="bottom", text = element_text(size = 20))
+      theme(legend.position="bottom", text = element_text(size = 20))+
+      labs(fill = "")
     
     # get legend
     leg <- get_legend(p_imse_val_log)
@@ -321,14 +325,14 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     
     ggsave(p_both_log,
            filename = paste0(out_folder,
-                             paste0("imseY_imseBeta_log_", beta_num,
+                             paste0("train_cveY_val_imseY_log_imseBeta", beta_num,
                                     ".pdf")  ),
-           width = 15, height = 6 )
+           width = 16, height = 8 )
     ggsave(p_both_log,
            filename = paste0(out_folder,
-                             paste0("imseY_imseBeta_log_", beta_num,
+                             paste0("train_cveY_val_imseY_log_imseBeta", beta_num,
                                     ".png")  ),
-           width = 15, height = 6 )
+           width = 16, height = 8 )
     
     
     
@@ -366,21 +370,21 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     ggsave(p_elapsed,
            filename = paste0(out_folder,
                              paste0("computaion_times_", beta_num,".png")  ),
-           width = 6, height = 6 )
+           width = 8, height = 6 )
     ggsave(p_elapsed,
            filename = paste0(out_folder,
                              paste0("computaion_times_", beta_num,".pdf")  ),
-           width = 6, height = 6 )
+           width = 8, height = 6 )
     
     
     ggsave(p_elapsed_log,
            filename = paste0(out_folder,
                              paste0("computaion_times_log_", beta_num,".png")  ),
-           width = 6, height = 6 )
+           width = 8, height = 6 )
     ggsave(p_elapsed_log,
            filename = paste0(out_folder,
                              paste0("computaion_times_log_", beta_num,".pdf")  ),
-           width = 6, height = 6 )
+           width = 8, height = 6 )
     
     
   } # loop "beta.num"
