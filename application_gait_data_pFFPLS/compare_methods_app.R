@@ -14,6 +14,21 @@ compare_methods_app <- function(input_folder){
   }
   
   
+  # Mean IMSE (Y validation) files:
+  
+  all_cves_val <- data.frame()
+  
+  all_cves_val_files <- list.files(path = input_folder, pattern = "imse_Y_validation")
+  
+  for (ind_file in all_cves_val_files) {
+    
+    all_cves_val <- rbind(
+      all_cves_val,
+      readRDS(paste0(input_folder, ind_file))
+    )
+    
+  }
+  
   # CVEs files:
   
   all_cves <- data.frame()
@@ -29,6 +44,21 @@ compare_methods_app <- function(input_folder){
     
   }
   
+  
+  # Best number of bases:
+  
+  all_best_bases <- data.frame()
+  
+  all_best_bases_files <- list.files(path = input_folder, pattern = "best_num_bases_ffpls_rep_")
+  
+  for (ind_file in all_best_bases_files) {
+    
+    all_best_bases <- rbind(
+      all_best_bases,
+      readRDS(paste0(input_folder, ind_file))
+    )
+    
+  }
   
   # Best Lambdas files:
   
@@ -64,6 +94,12 @@ compare_methods_app <- function(input_folder){
   all_cves <- all_cves %>%
     mutate(nComp = as.factor(nComp))
   
+  all_cves_val <- all_cves_val %>%
+    mutate(nComp = as.factor(nComp))
+  
+  all_best_bases <- all_best_bases %>% 
+    mutate(nComp = as.factor(nComp))
+  
   all_best_lambdas <- all_best_lambdas %>%
     mutate(nComp = as.factor(nComp))
   
@@ -85,15 +121,16 @@ compare_methods_app <- function(input_folder){
               sd_CVE = sd(CVE),
               mean_rCVE = sqrt(mean_CVE),
               sd_rCVE = sqrt(sd_CVE)
-              )
-    
+    )
+  
   saveRDS(object = df_s, file = paste0(out_folder, "summary_CVE.Rds"))
-    
+  
   
   # MSE --------------------------------------------------------------
   
   
   color_codes <- c("pFFPLS" = hue_pal()(3)[3],
+                   "FFPLS_opt_bases" = hue_pal()(3)[2],
                    "FFPLS" = hue_pal()(3)[1])
   
   
@@ -167,6 +204,76 @@ compare_methods_app <- function(input_folder){
   
   
   
+  # IMSE (Y) validation -----------------------------------------------------
+  
+  p_cve_val <- ggplot(all_cves_val,
+                  aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
+    geom_boxplot(position=position_dodge(0.8))  +
+    ylab("Validation: IMSE(Y)") +
+    xlab("# of components") +
+    scale_fill_manual(values = color_codes)+
+    theme_bw()  +
+    theme(legend.position="bottom", text = element_text(size = 20)) +
+    labs(fill = "")
+  
+  saveRDS(p_cve_val, file = paste0(out_folder, "imseY_val.Rds") )
+  
+  ggsave(p_cve_val,
+         filename = paste0(out_folder,
+                           paste0("imseY_val.png")  ),
+         width = 8, height = 6 )
+  ggsave(p_cve_val,
+         filename = paste0(out_folder,
+                           paste0("imseY_val.pdf")  ),
+         width = 8, height = 6 )
+  
+  
+  # Sq. root CVE
+  p_cve2_val <- ggplot(all_cves_val,
+                   aes(x = nComp, y = sqrt(mean_imse_Y_val), fill = method)) +
+    geom_boxplot(position=position_dodge(0.8))  +
+    ylab("Validation: sqrt{ IMSE(Y) }") +
+    xlab("# of components") +
+    scale_fill_manual(values = color_codes)+
+    theme_bw()  +
+    theme(legend.position="bottom", text = element_text(size = 20)) +
+    labs(fill = "")
+  
+  saveRDS(p_cve2_val, file = paste0(out_folder, "sqrt_cve_Y_val.Rds") )
+  
+  
+  ggsave(p_cve2_val,
+         filename = paste0(out_folder,
+                           paste0("sqrt_cve_Y_val.png")  ),
+         width = 8, height = 6 )
+  ggsave(p_cve2,
+         filename = paste0(out_folder,
+                           paste0("sqrt_cve_Y_val.pdf")  ),
+         width = 8, height = 6 )
+  
+  # Log-scale
+  p_cve_log_val <- ggplot(all_cves_val,
+                      aes(x = nComp, y = log(mean_imse_Y_val, base = 10), fill = method)) +
+    geom_boxplot(position=position_dodge(0.8))  +
+    ylab("Validation: log IMSE(Y)") +
+    xlab("# of components") +
+    scale_fill_manual(values = color_codes)+
+    theme_bw()  +
+    theme(legend.position="bottom", text = element_text(size = 20)) +
+    labs(fill = "")
+  
+  saveRDS(p_cve_log_val, file = paste0(out_folder, "imseY_log_val.Rds") )
+  
+  
+  ggsave(p_cve_log_val,
+         filename = paste0(out_folder,
+                           paste0("imseY_log_val.pdf")  ),
+         width = 8, height = 6 )
+  ggsave(p_cve_log_val,
+         filename = paste0(out_folder,
+                           paste0("imseY_log_val.png")  ),
+         width = 8, height = 6 )
+  
   
   
   
@@ -222,6 +329,61 @@ compare_methods_app <- function(input_folder){
   
   ggsave(p_lamb,
          filename = paste0(out_folder, "log_lambdasY.pdf"),
+         width = 8, height = 6 )
+  
+  
+  
+  # Best number of bases FFPLS ---------------------------------------------------------------
+  
+  df <- all_best_bases %>% 
+    pivot_longer(cols = ends_with("_X"),
+                 names_to = "target",
+                 values_to = "number_bases")
+  
+  
+  p_bases <- ggplot(df,
+                   aes(x = nComp, y = number_bases )) +
+    facet_grid(~method) +
+    geom_boxplot() +
+    ylab("Number of bases for X") +
+    xlab("# of components") +
+    theme_bw() +
+    theme(text = element_text(size = 20))
+  
+  # p_bases
+  
+  ggsave(p_bases,
+         filename = paste0(out_folder, "best_num_bases_X.png"),
+         width = 12, height = 6 )
+  
+  ggsave(p_bases,
+         filename = paste0(out_folder, "best_num_bases_X.pdf"),
+         width = 8, height = 6 )
+  
+  
+  
+  df <- all_best_lambdas %>% 
+    pivot_longer(cols = ends_with("_Y"),
+                 names_to = "target",
+                 values_to = "number_bases")
+  
+  p_bases <- ggplot(df,
+                    aes(x = nComp, y = number_bases )) +
+    facet_grid(~method) +
+    geom_boxplot() +
+    ylab("Number of bases for Y") +
+    xlab("# of components") +
+    theme_bw() +
+    theme(text = element_text(size = 20))
+  
+  # p_bases
+  
+  ggsave(p_lamb,
+         filename = paste0(out_folder, "best_num_bases_Y.png"),
+         width = 12, height = 6 )
+  
+  ggsave(p_lamb,
+         filename = paste0(out_folder, "best_num_bases_Y.pdf"),
          width = 8, height = 6 )
   
   

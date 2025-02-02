@@ -8,6 +8,7 @@ library(viridis)
 library(doParallel)
 library(penFoFPLS)
 
+library(refund) # for Ivanescu's method
 
 hip_on_knee = T
 
@@ -121,6 +122,8 @@ Y_orig <- Y
 
 
 # Usage of Ivanescus' method:
+
+data1 <- list(X_orig = X_orig, Y_orig = Y_orig, argvals_X = argvals_X, argvals_Y = argvals_Y)
 
 
 m2 <- pffr(Y_orig ~ 0 + ff(X_orig, xind=argvals_X), 

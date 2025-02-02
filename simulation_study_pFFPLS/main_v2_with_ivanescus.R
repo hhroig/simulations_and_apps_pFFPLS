@@ -14,6 +14,8 @@ library(pls)
 library(dplyr)
 library(penFoFPLS)
 library(fda)
+library(refund)
+library(reshape2)
 
 do_setting <- 3 # settings 1, 2, or 3
 
@@ -53,7 +55,7 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 10
+num_lambdas <- 3
 lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
@@ -93,7 +95,7 @@ if (do_setting == 3) {
   LL <- 40 # number of basis for Y(q)
   KK <- 40 # number of basis for X(p)
   
-  LL_list <- round(seq(5, 40, length.out = num_lambdas)) # list of number of bases for Y(q)
+  LL_list <- round(seq(9, 40, length.out = num_lambdas)) # list of number of bases for Y(q)
   KK_list <- LL_list                                     # list of number of bases for X(p)
   do_opt_bases_FFPLS = TRUE
 }
@@ -108,11 +110,11 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  2
+total_reps  <-  3
 rep_starts <- 1
 
 # number of PLS components to compute:
-max_nComp <- 5
+max_nComp <- 3
 
 # number K of folds to do cross-validation:
 num_folds <- 5
@@ -123,19 +125,17 @@ if (!dir.exists( paste0(shared_folder, "results_simulations/")) ) {
   dir.create( paste0(shared_folder, "results_simulations/") ) 
 }
 
-
-# output folder:
 out_folder <- paste0(shared_folder,
                      "results_simulations/",
-                     "setting_", do_setting,
-                     "_reps_", 
+                     "set", do_setting,
+                     "_reps", 
                      total_reps, 
-                     "_pen_", 
+                     "_pen", 
                      length(penaltyvec_X)*length(penaltyvec_Y),
-                     "_K_", KK, "_L_", LL,
-                     "_optFFPLS_", do_opt_bases_FFPLS,
-                     "_center_", center,
+                     "_K", KK, "_L", LL,
                      "/")
+
+
 
 if (!dir.exists(out_folder)) {
   dir.create(out_folder)
@@ -149,7 +149,7 @@ nodes_CL = detectCores()   # Detect number of cores to use
 cl = makeCluster(nodes_CL) # Specify number of threads here
 registerDoParallel(cl)
 
-source("simulations_fofr_v2.R", local = TRUE)
+source("simulations_fofr_v2_with_ivanescus.R", local = TRUE)
 
 stopCluster(cl)
 
@@ -157,7 +157,7 @@ stopCluster(cl)
 # Plot comparisons --------------------------------------------------------
 
 
-source("compare_methods_fofr.R", local = TRUE)
+source("compare_methods_fofr_with_ivanescu.R", local = TRUE)
 
 compare_methods_fun(input_folder = out_folder)
 
