@@ -55,7 +55,7 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 3
+num_lambdas <- 10
 lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
@@ -110,11 +110,11 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  3
+total_reps  <-  30
 rep_starts <- 1
 
 # number of PLS components to compute:
-max_nComp <- 3
+max_nComp <- 8
 
 # number K of folds to do cross-validation:
 num_folds <- 5
