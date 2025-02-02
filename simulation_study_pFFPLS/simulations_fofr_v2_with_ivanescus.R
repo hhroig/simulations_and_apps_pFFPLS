@@ -376,6 +376,7 @@ for(beta.num in num_betas)       {
                        tibble(
                          r2_train = R_sqr_function(Y, y_pred),
                          r2_val = R_sqr_function(Y_val, y_val_pred),
+                         q = argvals_Y,
                          nComp = nComp,
                          beta.num = beta.num,
                          rep_num = rep_num,
@@ -441,6 +442,7 @@ for(beta.num in num_betas)       {
                        tibble(
                          r2_train = R_sqr_function(Y, y_pred),
                          r2_val = R_sqr_function(Y_val, y_val_pred),
+                         q = argvals_Y,
                          nComp = nComp,
                          beta.num = beta.num,
                          rep_num = rep_num,
@@ -514,6 +516,7 @@ for(beta.num in num_betas)       {
                          tibble(
                            r2_train = R_sqr_function(Y, y_pred),
                            r2_val = R_sqr_function(Y_val, y_val_pred),
+                           q = argvals_Y,
                            nComp = nComp,
                            beta.num = beta.num,
                            rep_num = rep_num,
@@ -573,6 +576,7 @@ for(beta.num in num_betas)       {
                        tibble(
                          r2_train = R_sqr_function(Y, y_pred),
                          r2_val = R_sqr_function(Y_val, y_val_pred),
+                         q = beta_hat$y,
                          nComp = nComp,
                          beta.num = beta.num,
                          rep_num = rep_num,
@@ -629,7 +633,7 @@ for(beta.num in num_betas)       {
                      ".Rds"))
     
     
-    saveRDS(computation_times, file =
+    saveRDS(all_r2s, file =
               paste0(out_folder,
                      "R2s_rep_",
                      rep_num,
@@ -637,7 +641,7 @@ for(beta.num in num_betas)       {
                      beta.num,
                      ".Rds"))
     
-    saveRDS(all_r2s, file =
+    saveRDS(computation_times, file =
               paste0(out_folder,
                      "computation_times_rep_",
                      rep_num,
