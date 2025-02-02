@@ -1,11 +1,9 @@
 # For internal use and sharing:
-shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
 
+# shared_folder = "C:/Users/hhroi/Mi unidad (hahernan@est-econ.uc3m.es)/Revision_FoF_PLS/outputs_new_simulations_and_apps/"
 
 # Leave blank if you want to save in the working directory:
-# shared_folder = ""
-
-
+shared_folder = ""
 
 
 # Data Block --------------------------------------------------------------
