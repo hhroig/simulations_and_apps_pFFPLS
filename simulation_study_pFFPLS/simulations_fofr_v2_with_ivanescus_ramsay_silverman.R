@@ -85,20 +85,90 @@ for(beta.num in num_betas)       {
     
     # Fix to 20 the number of basis for the generated data:
     gendata <- generate_fofr_data(nbasisX = 20, nbasisY = 20, nbeta = beta.num,
-                                  nnodesX = nnodesX, nnodesY = nnodesY)
+                                  nnodesX = nnodesX, nnodesY = nnodesY, 
+                                  n = 100, n_validation = 50)
     
-    X <- gendata$X
+    X_gen <- gendata$X
     Y <- gendata$Y
     beta_true <- gendata$beta_true
     
-    X_val <- gendata$X_val
+    X_gen_val <- gendata$X_val
     Y_val <- gendata$Y_val
+    
+    if (X_sd_error > 0) {
+      X <- X_gen + stats::rnorm(nrow(X_gen), mean = 0, sd = X_sd_error)
+      X_val <- X_gen_val + stats::rnorm(nrow(X_gen_val), mean = 0, sd = X_sd_error)
+    }
+    
+    
     
     folds <- caret::createFolds(1:nrow(Y), k = num_folds)
     
     
+    # CV - Ramsay & Silverman PENALIZED ------------------------------------------------------------------
     
-    # Ivanescu's pffr --------------------------------
+    cat("    -> starting Ramsay & Silverman penalized model\n")
+    
+    
+    time_penalized_rs <- system.time({  # Measure time
+      cv_penalized_rs <- cv_penalties_fregre.basis.fr(X,
+                                                      Y,
+                                                      argvals_X = argvals_X,
+                                                      argvals_Y = argvals_Y,
+                                                      num_bases_X = KK_rs,
+                                                      num_bases_Y = LL_rs,
+                                                      fda_basis_func_X = fda::create.bspline.basis,
+                                                      fda_basis_func_Y = fda::create.bspline.basis,
+                                                      penalty_X = penaltyvec_X,
+                                                      penalty_Y = penaltyvec_Y,
+                                                      folds = folds,
+                                                      verbose = TRUE,
+                                                      stripped = FALSE,
+                                                      Lfd_X = fda::vec2Lfd(c(0, 0), range(argvals_X)),
+                                                      Lfd_Y = fda::vec2Lfd(c(0, 0), range(argvals_Y))
+      )
+    })
+    
+    cat("    -> Ramsay & Silverman penalized done\n")
+    
+    best_lambdas <- rbind(
+      best_lambdas,
+      data.frame(lambda.penalty_X = cv_penalized_rs$best_penalties['penalty_X'],
+                 lambda.penalty_Y = cv_penalized_rs$best_penalties['penalty_Y'],
+                 method = "pFFR_RS",
+                 nComp = NA,
+                 beta.num = beta.num,
+                 rep_num = rep_num)
+    )
+    
+    
+    all_CVEs <- rbind(
+      all_CVEs,
+      # Repeat the same unique CVE for all nComp (just for comparison purposes):
+      data.frame(
+        CVE = as.numeric(  cv_penalized_rs$CVEs  ),
+        method = "pFFR_RS",
+        nComp = 1:max_nComp,
+        beta.num = beta.num,
+        rep_num = rep_num
+      )
+    )
+    
+    # Record computation time
+    computation_times <- rbind(
+      computation_times,
+      data.frame(
+        method = "pFFR_RS",
+        beta.num = beta.num,
+        nComp = max_nComp,
+        rep_num = rep_num,
+        elapsed_time = time_penalized_rs["elapsed"]
+      )
+    )
+    
+    
+    
+    # CV - Ivanescu's pffr --------------------------------
     
     cat("    -> starting Ivanescu's pffr\n")
     
@@ -122,7 +192,7 @@ for(beta.num in num_betas)       {
     computation_times <- rbind(
       computation_times,
       data.frame(
-        method = "pffr",
+        method = "pFFR_I",
         beta.num = beta.num,
         nComp = max_nComp,
         rep_num = rep_num,
@@ -130,9 +200,9 @@ for(beta.num in num_betas)       {
       )
     )
     
-    # CV - PENALIZED ------------------------------------------------------------------
+    # CV - pFFPLS ------------------------------------------------------------------
     
-    cat("    -> starting penalized model\n")
+    cat("    -> starting pFFPLS\n")
     
     time_penalized <- system.time({  # Measure time
       cv_penalized <- cv_unique_fof_par(X = X,
@@ -151,7 +221,7 @@ for(beta.num in num_betas)       {
                                         maxit = 100000 )
     })
     
-    cat("    -> penalized model done\n")
+    cat("    -> pFFPLS done\n")
     
     best_lambdas <- rbind(
       best_lambdas,
@@ -188,9 +258,10 @@ for(beta.num in num_betas)       {
     
     
     
-    # CV NonPenalized (no penalties) ---------------------------------------------------
     
-    cat("    -> starting non-penalized model\n")
+    # CV - FFPLS (no penalties) ---------------------------------------------------
+    
+    cat("    -> starting FFPLS model\n")
     
     time_nonpen <- system.time({  # Measure time
       cv_nonpen <- cv_unique_fof_par(X = X,
@@ -211,7 +282,7 @@ for(beta.num in num_betas)       {
     
     
     
-    cat("    -> non-penalized model done\n")
+    cat("    -> FFPLS model done\n")
     
     best_lambdas <- rbind(
       best_lambdas,
@@ -246,11 +317,11 @@ for(beta.num in num_betas)       {
     )
     
     
-    # CV NonPenalized with basis optimization (no penalties) ---------------------------------------------------
+    # CV - FFPS basis optimization (no penalties) ---------------------------------------------------
     
     if (do_opt_bases_FFPLS) {
       
-      cat("    -> starting non-penalized model with num bases opt.\n")
+      cat("    -> starting FFPLS with optimal bases\n")
       
       time_nonpen_bases <- system.time({  # Measure time
         cv_nonpen_bases <- cv_bases_fof_par(X = X,
@@ -274,12 +345,12 @@ for(beta.num in num_betas)       {
       })
       
       
-      cat("    -> non-penalized model with num bases opt. done\n")
+      cat("    -> FFPLS with optimal bases done\n")
       
       best_num_bases <- rbind(
         best_num_bases,
         data.frame(num_bases = cv_nonpen_bases$best_num_bases,
-                   method = "FFPLS_opt_bases",
+                   method = "FFPLS_OB",
                    nComp = 1:max_nComp,
                    beta.num = beta.num,
                    rep_num = rep_num)
@@ -289,7 +360,7 @@ for(beta.num in num_betas)       {
         all_CVEs,
         data.frame(
           CVE = cv_nonpen_bases$CVEs_ncomp,
-          method = "FFPLS_opt_bases",
+          method = "FFPLS_OB",
           nComp = 1:max_nComp,
           beta.num = beta.num,
           rep_num = rep_num
@@ -301,7 +372,7 @@ for(beta.num in num_betas)       {
       computation_times <- rbind(
         computation_times,
         data.frame(
-          method = "FFPLS_opt_bases",
+          method = "FFPLS_OB",
           beta.num = beta.num,
           nComp = max_nComp,
           rep_num = rep_num,
@@ -319,7 +390,7 @@ for(beta.num in num_betas)       {
     for (nComp in 1:max_nComp) {
       cat("       ---> final models cmpt:", nComp, "/", max_nComp, "\n")
       
-      ## Penalized model ----
+      ## pFFPLS -----
       
       m_final <- ffpls_bs(X = X,
                           Y = Y,
@@ -390,7 +461,7 @@ for(beta.num in num_betas)       {
       rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
       
       
-      ## NonPenalized model ----
+      ## FFPLS ----
       
       m_final <- ffpls_bs(X = X,
                           Y = Y,
@@ -456,7 +527,7 @@ for(beta.num in num_betas)       {
       rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
       
       
-      ## NonPenalized model after num bases opt. ----
+      ## FFPLS optimal bases ----
       
       if (do_opt_bases_FFPLS) {
         
@@ -485,7 +556,7 @@ for(beta.num in num_betas)       {
         beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
         beta_df$z <- as.vector(beta_hat)
         beta_df$z_true <- as.vector(beta_true)
-        beta_df$method <- "FFPLS_opt_bases"
+        beta_df$method <- "FFPLS_OB"
         beta_df$nComp <- nComp
         beta_df$beta.num <- beta.num
         beta_df$rep_num <- rep_num
@@ -507,7 +578,7 @@ for(beta.num in num_betas)       {
                                  nComp = nComp,
                                  beta.num = beta.num,
                                  rep_num = rep_num,
-                                 method = "FFPLS_opt_bases")
+                                 method = "FFPLS_OB")
         )
         
         
@@ -523,7 +594,7 @@ for(beta.num in num_betas)       {
                            nComp = nComp,
                            beta.num = beta.num,
                            rep_num = rep_num,
-                           method = "FFPLS_opt_bases")
+                           method = "FFPLS_OB")
         )
         
         
@@ -532,7 +603,7 @@ for(beta.num in num_betas)       {
       }
       
       
-      # Ivanescu's pffr --------------------------------
+      ## Ivanescu's pffr --------------------------------
       
       beta_hat <- coef(m_final_pffr)[["smterms"]][["ff(X,argvals_X)"]]
       beta_true_rebuilt <- redo_beta_true(q = beta_hat$y, p = beta_hat$x, nbeta = beta.num)
@@ -544,7 +615,7 @@ for(beta.num in num_betas)       {
       beta_df$z <- as.vector( t(reshape2::acast(beta_df, q~p, value.var = "z"))  )
       
       beta_df$z_true <- as.vector(beta_true_rebuilt)
-      beta_df$method <- "pffr"
+      beta_df$method <- "pFFR_I"
       beta_df$nComp <- nComp       # No actual components, leave it here for comparison purposes!
       beta_df$beta.num <- beta.num
       beta_df$rep_num <- rep_num
@@ -566,7 +637,7 @@ for(beta.num in num_betas)       {
                                nComp = nComp,       # No actual components, leave it here for comparison purposes!
                                beta.num = beta.num,
                                rep_num = rep_num,
-                               method = "pffr")
+                               method = "pFFR_I")
       )
       
       
@@ -583,13 +654,80 @@ for(beta.num in num_betas)       {
                          nComp = nComp,
                          beta.num = beta.num,
                          rep_num = rep_num,
-                         method = "pffr")
+                         method = "pFFR_I")
       )
       
       
-      rm(m_final, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) 
-      rm(beta_hat, beta_df, mean_imse_Y_val) # I'll reuse the same model name
-    
+      rm(y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
+      
+      
+      
+      
+      ## Ramsay & Silverman (penalized) ----
+      
+      m_final_rs <- cv_penalized_rs$final_model
+      
+      beta_hat <- fda::eval.bifd(argvals_Y, argvals_X, m_final_rs$beta.est)
+      
+      beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
+      beta_df$z <- as.vector(beta_hat)
+      beta_df$z_true <- as.vector(beta_true)
+      beta_df$method <- "pFFR_RS"
+      beta_df$nComp <- nComp
+      beta_df$beta.num <- beta.num
+      beta_df$rep_num <- rep_num
+      
+      # Predict validation set (re-sourced predict function with fixes):
+      y_val_pred <- predict_fregre_fr(object = m_final_rs,
+                                      new.fdataobj = 
+                                        fda.usc::fdata(X_val,
+                                                       argvals = argvals_X,
+                                                       rangeval = range(argvals_X)) )$data
+      
+      
+      all_beta_hats <- rbind(all_beta_hats, beta_df )
+      
+      
+      # Compute the average IMSE for the validation set:
+      mean_imse_Y_val <- mean_imse_by_row(Y_val, # trueX
+                                          y_val_pred,
+                                          argvals_Y)
+      
+      
+      all_final_res <- rbind(all_final_res,
+                             tibble(
+                               imse = penFoFPLS::imse_beta_ffpls_bs(beta_true,
+                                                                    beta_hat,
+                                                                    argvals_X,
+                                                                    argvals_Y),
+                               mean_imse_Y_val = mean_imse_Y_val,
+                               nComp = nComp,
+                               beta.num = beta.num,
+                               rep_num = rep_num,
+                               method = "pFFR_RS")
+      )
+      
+      
+      
+      # Compute R2 for the training and validation sets:
+      y_pred <- fitted.values(m_final_rs)$data
+      
+      all_r2s <- rbind(all_r2s,
+                       tibble(
+                         R2_train = R_sqr_function(Y, y_pred),
+                         R2_val = R_sqr_function(Y_val, y_val_pred),
+                         q = argvals_Y,
+                         nComp = nComp,
+                         beta.num = beta.num,
+                         rep_num = rep_num,
+                         method = "pFFR_RS")
+      )
+      
+      
+      rm(m_final_rs, y_pred, y_val_pred, beta_df, beta_hat, mean_imse_Y_val) # I'll reuse the same model name
+      
+      
+      
     }  # end nComp loop
     
     
