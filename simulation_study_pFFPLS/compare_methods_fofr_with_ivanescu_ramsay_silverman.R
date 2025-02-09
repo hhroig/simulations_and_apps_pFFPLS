@@ -15,7 +15,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   }
   
   
-  # show_col(hue_pal()(5))
+  # show_col(hue_pal()(6))
   
   color_codes <- c(
     "pFFPLS" = hue_pal()(6)[1],
@@ -150,78 +150,33 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   
   all_final_res <- all_final_res %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
+    mutate(nComp = as.factor(nComp))
+  # %>% 
+  #   mutate(
+  #     method = case_when(
+  #       method == "Penalized" ~ "pFFPLS",
+  #       method == "Penalized Ivanescu's" ~ "pFFR_I",
+  #       method == "NonPenalized" ~ "FFPLS",
+  #       method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
+  #       .default = method
+  #     )
+  #   )
   
   all_cves <- all_cves %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
+    mutate(nComp = as.factor(nComp))
   
   all_best_lambdas <- all_best_lambdas %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
+    mutate(nComp = as.factor(nComp)) 
   
   all_computation_times <- all_computation_times %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
-  
+    mutate(nComp = as.factor(nComp)) 
   
   all_betas <- all_betas %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
+    mutate(nComp = as.factor(nComp))
   
   
   all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
-    mutate(nComp = as.factor(nComp)) %>% 
-    mutate(
-      method = case_when(
-        method == "Penalized" ~ "pFFPLS",
-        method == "Penalized Ivanescu's" ~ "pFFR_I",
-        method == "NonPenalized" ~ "FFPLS",
-        method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-        .default = method
-      )
-    )
+    mutate(nComp = as.factor(nComp)) 
   
   
   # Limits:
@@ -434,6 +389,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
                                               "FFPLS_OB",
                                               "pFFPLS",
                                               "pFFR_I",
+                                              "pFFR_RS",
                                               "True Beta") )) %>%
     group_by(method, beta.num, nComp, q) %>%
     summarise(Training = mean(R2_train), Validation = mean(R2_val))
@@ -512,6 +468,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
                                               "FFPLS_OB",
                                               "pFFPLS",
                                               "pFFR_I",
+                                              "pFFR_RS",
                                               "True Beta") )) %>%
     dplyr::select(-z_true) %>% 
     rbind(df_true_betas) %>% 
@@ -629,6 +586,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
                                               "FFPLS_OB",
                                               "pFFPLS",
                                               "pFFR_I",
+                                              "pFFR_RS",
                                               "True Beta") )) %>%
     dplyr::select(-z_true) %>% 
     group_by(method, beta.num, nComp, p, q) %>%

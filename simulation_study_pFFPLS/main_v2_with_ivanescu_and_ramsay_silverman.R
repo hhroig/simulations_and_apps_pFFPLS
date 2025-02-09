@@ -137,12 +137,12 @@ if (!dir.exists( paste0(shared_folder, "results_simulations/")) ) {
 out_folder <- paste0(shared_folder,
                      "results_simulations/",
                      "set", do_setting,
-                     "_Xerror", X_sd_error,
-                     "_reps", 
+                     ifelse(X_sd_error > 0, "e", ""),
+                     "_rep", 
                      total_reps, 
                      "_pen", 
                      length(penaltyvec_X)*length(penaltyvec_Y),
-                     "_K", KK, "_L", LL,
+                     "_K", KK, "L", LL,
                      "/")
 
 
@@ -175,7 +175,7 @@ stopCluster(cl)
 # Plot comparisons --------------------------------------------------------
 
 
-# source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R", local = TRUE)
-# 
-# compare_methods_fun(input_folder = out_folder)
+source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R", local = TRUE)
+
+compare_methods_fun(input_folder = out_folder)
 
