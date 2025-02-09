@@ -58,7 +58,7 @@ X_sd_error <- 0.2
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 3
+num_lambdas <- 10
 # lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
 lambdas_in  <-  seq(-2, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
@@ -119,7 +119,7 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  3
+total_reps  <-  30
 rep_starts <- 1
 
 # number of PLS components to compute:
