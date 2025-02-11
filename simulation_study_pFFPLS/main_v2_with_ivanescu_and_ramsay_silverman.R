@@ -17,7 +17,7 @@ library(fda)
 library(refund)
 library(reshape2)
 
-do_setting <- 3 # settings 1, 2, or 3
+do_setting <- 2 # settings 1, 2, or 3
 
 # Settings ----------------------------------------------------------------
 
@@ -78,8 +78,8 @@ argvals_Y <- seq(0, 1, length.out = nnodesY) # q
 
 # # Setting 1:
 if (do_setting == 1) {
-  LL <- 5 # number of basis for Y(q)
-  KK <- 5 # number of basis for X(p)
+  LL <- 10 # number of basis for Y(q)
+  KK <- 10 # number of basis for X(p)
   do_opt_bases_FFPLS = FALSE
 }
 
