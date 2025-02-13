@@ -98,6 +98,9 @@ for(beta.num in num_betas)       {
     if (X_sd_error > 0) {
       X <- X_gen + stats::rnorm(nrow(X_gen), mean = 0, sd = X_sd_error)
       X_val <- X_gen_val + stats::rnorm(nrow(X_gen_val), mean = 0, sd = X_sd_error)
+    }else {
+      X <- X_gen
+      X_val <- X_gen_val
     }
     
     
@@ -119,8 +122,8 @@ for(beta.num in num_betas)       {
                                                       num_bases_Y = LL_rs,
                                                       fda_basis_func_X = fda::create.bspline.basis,
                                                       fda_basis_func_Y = fda::create.bspline.basis,
-                                                      penalty_X = penaltyvec_X,
-                                                      penalty_Y = penaltyvec_Y,
+                                                      penalty_X = penaltyvec_X_RS,
+                                                      penalty_Y = penaltyvec_Y_RS,
                                                       folds = folds,
                                                       verbose = TRUE,
                                                       stripped = FALSE,
@@ -667,7 +670,7 @@ for(beta.num in num_betas)       {
       
       m_final_rs <- cv_penalized_rs$final_model
       
-      beta_hat <- fda::eval.bifd(argvals_Y, argvals_X, m_final_rs$beta.est)
+      beta_hat <- t(fda::eval.bifd(argvals_Y, argvals_X, m_final_rs$beta.est))
       
       beta_df <- expand.grid(q = argvals_Y, p = argvals_X) 
       beta_df$z <- as.vector(beta_hat)
@@ -765,13 +768,15 @@ for(beta.num in num_betas)       {
                      beta.num,
                      ".Rds"))
     
-    saveRDS(best_num_bases, file =
-              paste0(out_folder,
-                     "best_num_bases_FFPLS_rep_",
-                     rep_num,
-                     "_beta_",
-                     beta.num,
-                     ".Rds"))
+    if (do_opt_bases_FFPLS) {
+      saveRDS(best_num_bases, file =
+                paste0(out_folder,
+                       "best_num_bases_FFPLS_rep_",
+                       rep_num,
+                       "_beta_",
+                       beta.num,
+                       ".Rds"))
+    }
     
     
     saveRDS(all_r2s, file =
