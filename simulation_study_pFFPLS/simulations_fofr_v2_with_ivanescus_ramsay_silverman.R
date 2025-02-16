@@ -163,9 +163,9 @@ for(beta.num in num_betas)       {
       data.frame(
         method = "pFFR_RS",
         beta.num = beta.num,
-        nComp = max_nComp,
+        nComp = 1:max_nComp,
         rep_num = rep_num,
-        elapsed_time = time_penalized_rs["elapsed"]
+        elapsed_time = time_penalized_rs[["elapsed"]]
       )
     )
     
@@ -197,9 +197,9 @@ for(beta.num in num_betas)       {
       data.frame(
         method = "pFFR_I",
         beta.num = beta.num,
-        nComp = max_nComp,
+        nComp = 1:max_nComp,
         rep_num = rep_num,
-        elapsed_time = time_pffr["elapsed"]
+        elapsed_time = time_pffr[["elapsed"]]
       )
     )
     
@@ -253,9 +253,9 @@ for(beta.num in num_betas)       {
       data.frame(
         method = "pFFPLS",
         beta.num = beta.num,
-        nComp = max_nComp,
+        nComp = 1:max_nComp,
         rep_num = rep_num,
-        elapsed_time = time_penalized["elapsed"]
+        elapsed_time = cv_penalized$elapsed
       )
     )
     
@@ -315,7 +315,7 @@ for(beta.num in num_betas)       {
         beta.num = beta.num,
         nComp = max_nComp,
         rep_num = rep_num,
-        elapsed_time = time_nonpen["elapsed"]
+        elapsed_time = cv_nonpen$elapsed
       )
     )
     
@@ -377,9 +377,9 @@ for(beta.num in num_betas)       {
         data.frame(
           method = "FFPLS_OB",
           beta.num = beta.num,
-          nComp = max_nComp,
+          nComp = 1:max_nComp,
           rep_num = rep_num,
-          elapsed_time = time_nonpen_bases["elapsed"]
+          elapsed_time = cv_nonpen_bases$elapsed
         )
       )
       
