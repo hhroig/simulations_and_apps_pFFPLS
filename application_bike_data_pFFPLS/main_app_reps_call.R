@@ -84,8 +84,8 @@ main_app_reps_call <- function(
                                           nbasis = LL)
   
   # Output folder:
-  out_folder <- paste0("results_app",
-                       "_rep", 
+  out_folder <- paste0("results/",
+                       "reps", 
                        total_reps, 
                        "_pen", 
                        length(penaltyvec_X)*length(penaltyvec_Y),
@@ -133,11 +133,19 @@ main_app_reps_call <- function(
 
 
 global_num_lambdas = 10
-global_total_reps = 3
+global_total_reps = 10
 
 
 main_app_reps_call(
   data_Rdata_path = "bike_data/bike_orig.RData",
   num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
+  total_reps  = global_total_reps,
+  
+  LL =  20, # number of basis for Y(q)
+  KK = 20, # number of basis for X(p)
+  
+  min_basis_for_opt = 9, # minimum number of basis for the optimization process
+  max_basis_for_opt = 20, # maximum number of basis for the optimization process
+  
+  max_nComp = 8 # maximum number of PLS components to compute
 )
