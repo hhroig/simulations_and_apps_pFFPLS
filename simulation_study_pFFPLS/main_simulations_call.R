@@ -12,31 +12,31 @@ library(doParallel)
 
 main_simulations_call <- function(
     
-    do_settings = 3, # settings 1, 2, or 3
-    
-    X_sd_error = 0, # Extra observation error for X (after data generation)
-    
-    center = TRUE, 
-    
-    num_betas = c(1, 3)  # betas ids
-    
-    num_lambdas = 10, # number of lambdas to be used in the grid search (for all)
-    
-    lower_penalty_bound_RS = -6, # lower bound for the penalty grid search in Ramsay & Silverman
-    upper_penalty_bound_RS = 8, # upper bound for the penalty grid search in Ramsay & Silverman
-    
-    lower_penalty_bound = -2, # lower bound for the penalty grid search in the proposed method
-    upper_penalty_bound = 12, # upper bound for the penalty grid search in the proposed method
-    
-    nnodesX = 100, # number of nodes for the functional predictors
-    nnodesY = 100, # number of nodes for the functional response
-    
-    total_reps  = 3, # number of repetitions
-    rep_starts = 1, # starting number of the repetitions
-    
-    num_folds = 5, # number of folds for the cross-validation
-                                  
-    ) {
+  do_setting = 3, # settings 1, 2, or 3
+  
+  X_sd_error = 0, # Extra observation error for X (after data generation)
+  
+  center = TRUE, 
+  
+  num_betas = c(1, 3),  # betas ids
+  
+  num_lambdas = 10, # number of lambdas to be used in the grid search (for all)
+  
+  lower_penalty_bound_RS = -6, # lower bound for the penalty grid search in Ramsay & Silverman
+  upper_penalty_bound_RS = 8, # upper bound for the penalty grid search in Ramsay & Silverman
+  
+  lower_penalty_bound = -2, # lower bound for the penalty grid search in the proposed method
+  upper_penalty_bound = 12, # upper bound for the penalty grid search in the proposed method
+  
+  nnodesX = 100, # number of nodes for the functional predictors
+  nnodesY = 100, # number of nodes for the functional response
+  
+  total_reps  = 100, # number of repetitions
+  rep_starts = 1, # starting number of the repetitions
+  
+  num_folds = 5 # number of folds for the cross-validation
+  
+) {
   
   # Grid search penalties for Ramsay & Silverman:
   lambdas_in_RS  <-  seq(lower_penalty_bound_RS, 
@@ -154,3 +154,61 @@ main_simulations_call <- function(
   
   
 }
+
+
+
+# Run the simulations -----------------------------------------------------
+
+
+global_num_lambdas = 2
+global_total_reps = 2
+
+
+# Setting 1:
+main_simulations_call(
+  do_setting = 1, 
+  X_sd_error = 0, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
+
+main_simulations_call(
+  do_setting = 1, 
+  X_sd_error = 0.2, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
+
+
+
+# Setting 2:
+main_simulations_call(
+  do_setting = 2, 
+  X_sd_error = 0, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
+
+main_simulations_call(
+  do_setting = 2, 
+  X_sd_error = 0.2, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
+
+
+
+# Setting 3:
+main_simulations_call(
+  do_setting = 3, 
+  X_sd_error = 0, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
+
+main_simulations_call(
+  do_setting = 3, 
+  X_sd_error = 0.2, 
+  num_lambdas = global_num_lambdas, 
+  total_reps  = global_total_reps
+)
