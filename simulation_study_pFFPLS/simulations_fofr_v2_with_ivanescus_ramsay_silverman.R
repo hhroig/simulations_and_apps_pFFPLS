@@ -334,7 +334,7 @@ for(beta.num in num_betas)       {
       data.frame(
         method = "FFPLS",
         beta.num = beta.num,
-        nComp = max_nComp,
+        nComp = 1:max_nComp,
         rep_num = rep_num,
         elapsed_time = cv_nonpen$elapsed
       )
