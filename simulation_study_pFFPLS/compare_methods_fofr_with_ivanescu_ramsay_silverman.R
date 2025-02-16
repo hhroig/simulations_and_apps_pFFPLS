@@ -8,8 +8,7 @@ library(plotly)
 
 compare_methods_fun <- function(input_folder, 
                                 zoom_r2_lower = 0.5, 
-                                do_rough_r2 = TRUE, 
-                                top_rank_imse = 30){
+                                do_rough_r2 = TRUE){
   
   out_folder <- paste0(input_folder, "results_plots/")
   
