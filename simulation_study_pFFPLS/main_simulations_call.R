@@ -160,8 +160,8 @@ main_simulations_call <- function(
 # Run the simulations -----------------------------------------------------
 
 
-global_num_lambdas = 2
-global_total_reps = 2
+global_num_lambdas = 10
+global_total_reps = 30
 
 
 # Setting 1:
