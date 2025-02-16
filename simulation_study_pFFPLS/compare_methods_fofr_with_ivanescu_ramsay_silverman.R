@@ -6,7 +6,10 @@ library(scales)
 library(plotly)
 
 
-compare_methods_fun <- function(input_folder, top_rank_imse = 30){
+compare_methods_fun <- function(input_folder, 
+                                zoom_r2_lower = 0.5, 
+                                do_rough_r2 = TRUE, 
+                                top_rank_imse = 30){
   
   out_folder <- paste0(input_folder, "results_plots/")
   
@@ -188,8 +191,6 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   # IMSE + MSE --------------------------------------------------------------
   
-  
-  
   for (beta_num in unique(all_final_res$beta.num)) {
     
     p_cve <- ggplot(all_cves %>% filter(beta.num == beta_num),
@@ -209,7 +210,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="none", text = element_text(size = 20))+
+      theme(legend.position="bottom", text = element_text(size = 20))+
       labs(fill = "")
     
     p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num),
@@ -228,16 +229,25 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     # remove from last plot
     p_imse_val <- p_imse_val + theme(legend.position="none")
     
-    p_both <- grid.arrange(p_cve, p_imse_val, p_imse, nrow = 1, bottom = leg)
+    p_both <- grid.arrange(p_cve, p_imse_val, nrow = 1, bottom = leg)
     
     ggsave(p_both,
            filename = paste0(out_folder,
-                             paste0("train_cveY_val_imseY_imseBeta", beta_num,".png")  ),
+                             paste0("train_cveY_val_imseY_beta", beta_num,".png")  ),
            width = 16, height = 8 )
     ggsave(p_both,
            filename = paste0(out_folder,
-                             paste0("train_cveY_val_imseY_imseBeta", beta_num,".pdf")  ),
+                             paste0("train_cveY_val_imseY_beta", beta_num,".pdf")  ),
            width = 16, height = 8 )
+    
+    ggsave(p_imse,
+           filename = paste0(out_folder,
+                             paste0("imse_beta", beta_num,".png")  ),
+           width = 12, height = 8 )
+    ggsave(p_imse,
+           filename = paste0(out_folder,
+                             paste0("imse_beta", beta_num,".pdf")  ),
+           width = 12, height = 8 )
     
     
     
@@ -259,7 +269,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
-      theme(legend.position="none", text = element_text(size = 20))+
+      theme(legend.position="bottom", text = element_text(size = 20))+
       labs(fill = "")
     
     p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num),
@@ -277,18 +287,29 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     # remove from last plot
     p_imse_val_log <- p_imse_val_log + theme(legend.position="none")
     
-    p_both_log <- grid.arrange(p_cve_log, p_imse_val_log, p_imse_log, nrow = 1, bottom = leg)
+    p_both_log <- grid.arrange(p_cve_log, p_imse_val_log, nrow = 1, bottom = leg)
     
     ggsave(p_both_log,
            filename = paste0(out_folder,
-                             paste0("train_cveY_val_imseY_log_imseBeta", beta_num,
+                             paste0("train_cveY_val_imseY_log_beta", beta_num,
                                     ".pdf")  ),
            width = 16, height = 8 )
     ggsave(p_both_log,
            filename = paste0(out_folder,
-                             paste0("train_cveY_val_imseY_log_imseBeta", beta_num,
+                             paste0("train_cveY_val_imseY_log_beta", beta_num,
                                     ".png")  ),
            width = 16, height = 8 )
+    
+    ggsave(p_imse_log,
+           filename = paste0(out_folder,
+                             paste0("log_imse_beta", beta_num,
+                                    ".pdf")  ),
+           width = 12, height = 8 )
+    ggsave(p_imse_log,
+           filename = paste0(out_folder,
+                             paste0("log_imse_beta", beta_num,
+                                    ".png")  ),
+           width = 12, height = 8 )
     
     
     
@@ -325,21 +346,21 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
     
     ggsave(p_elapsed,
            filename = paste0(out_folder,
-                             paste0("computaion_times_", beta_num,".png")  ),
+                             paste0("computaion_times_beta", beta_num,".png")  ),
            width = 8, height = 6 )
     ggsave(p_elapsed,
            filename = paste0(out_folder,
-                             paste0("computaion_times_", beta_num,".pdf")  ),
+                             paste0("computaion_times_beta", beta_num,".pdf")  ),
            width = 8, height = 6 )
     
     
     ggsave(p_elapsed_log,
            filename = paste0(out_folder,
-                             paste0("computaion_times_log_", beta_num,".png")  ),
+                             paste0("log_computaion_times_beta", beta_num,".png")  ),
            width = 8, height = 6 )
     ggsave(p_elapsed_log,
            filename = paste0(out_folder,
-                             paste0("computaion_times_log_", beta_num,".pdf")  ),
+                             paste0("log_computaion_times_beta", beta_num,".pdf")  ),
            width = 8, height = 6 )
     
     
@@ -381,7 +402,7 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
   
   
   
-  # Coefficient of Determination R2 ------------------------------------------
+  # R^2 ------------------------------------------
   
   summ_all_r2 <- all_best_r2 %>%
     as_tibble() %>%
@@ -426,28 +447,80 @@ compare_methods_fun <- function(input_folder, top_rank_imse = 30){
                                paste0("R2_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
              width = 12, height = 6 )
       
+      # Limit lower ylim for more details:
       
-      p_r2_both_rough <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
-                                aes(x = q, y = r2, color = method)) +
+      p_r2_both_zoom <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
+                          aes(x = q, y = r2, color = method)) +
         facet_wrap(~partition) +
-        geom_line(linewidth = 1, alpha = 0.8)  +
+        geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
         ylab("R^2") +
         xlab("q") +
         scale_color_manual(values = color_codes)+
-        ylim(0, 1) +
+        ylim(zoom_r2_lower, 1) +
         theme_bw()  +
         theme(legend.position="bottom", text = element_text(size = 20)) +
         labs(color = "")
       
       
-      ggsave(p_r2_both_rough,
+      ggsave(p_r2_both_zoom,
              filename = paste0(out_folder,
-                               paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+                               paste0("R2_zoom_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
              width = 12, height = 6 )
-      ggsave(p_r2_both_rough,
+      ggsave(p_r2_both_zoom,
              filename = paste0(out_folder,
-                               paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+                               paste0("R2_zoom_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
              width = 12, height = 6 )
+      
+      
+      
+      
+      if (do_rough_r2) {
+        p_r2_both_rough <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
+                                  aes(x = q, y = r2, color = method)) +
+          facet_wrap(~partition) +
+          geom_line(linewidth = 1, alpha = 0.8)  +
+          ylab("R^2") +
+          xlab("q") +
+          scale_color_manual(values = color_codes)+
+          ylim(0, 1) +
+          theme_bw()  +
+          theme(legend.position="bottom", text = element_text(size = 20)) +
+          labs(color = "")
+        
+        
+        ggsave(p_r2_both_rough,
+               filename = paste0(out_folder,
+                                 paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+               width = 12, height = 6 )
+        ggsave(p_r2_both_rough,
+               filename = paste0(out_folder,
+                                 paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+               width = 12, height = 6 )
+        
+        p_r2_both_rough_zoom <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
+                                  aes(x = q, y = r2, color = method)) +
+          facet_wrap(~partition) +
+          geom_line(linewidth = 1, alpha = 0.8)  +
+          ylab("R^2") +
+          xlab("q") +
+          scale_color_manual(values = color_codes)+
+          ylim(zoom_r2_lower, 1) +
+          theme_bw()  +
+          theme(legend.position="bottom", text = element_text(size = 20)) +
+          labs(color = "")
+        
+        
+        ggsave(p_r2_both_rough_zoom,
+               filename = paste0(out_folder,
+                                 paste0("R2_rough_zoom_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+               width = 12, height = 6 )
+        ggsave(p_r2_both_rough_zoom,
+               filename = paste0(out_folder,
+                                 paste0("R2_rough_zoom_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+               width = 12, height = 6 )
+        
+      } # if do_rough_r2
+      
       
     } # loop R^2
     
