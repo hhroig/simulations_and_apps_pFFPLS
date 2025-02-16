@@ -79,7 +79,7 @@ for(rep_num in rep_starts:total_reps)  {
   
   Y <- Y_orig[ind.n,]
   X <- X_orig[ind.n, ]
-  Y_val <- Y_orig[-ind.n, ]+1
+  Y_val <- Y_orig[-ind.n, ]
   X_val <- X_orig[-ind.n, ]
   
   
