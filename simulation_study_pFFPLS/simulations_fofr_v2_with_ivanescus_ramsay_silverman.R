@@ -2,6 +2,7 @@
 ## Then, code a CV method for this penalized approach by Ramsay and Silverman
 ## Adapt the same method we have for cv_unique_fof_par to this case...
 
+
 # Re-do beta function for Ivanescu's --------------------------------------
 
 redo_beta_true <- function(q, p, nbeta) {
@@ -51,6 +52,35 @@ R_sqr_function <- function(y_true, y_pred) {
   
 }
 
+
+
+# Mean IMSE by row --------------------------------------
+
+mean_imse_by_row <- function(func_true,
+                             func_hat,
+                             argvals){
+  
+  interval_length <- (max(argvals) - min(argvals))
+  
+  beta_diff_sq <- (func_true - func_hat)^2
+  
+  num_obs <- nrow(func_true)
+  
+  imse_by_row <- array(NA, dim = num_obs)
+  
+  for (row_argval in 1:nrow(func_true)) {
+    
+    imse_by_row[row_argval] <- (num_int_1d(argvals = argvals,
+                                           f_obs = beta_diff_sq[row_argval, ]))/interval_length
+  }
+  
+  
+  
+  mean_imse <- mean(imse_by_row)
+  
+  return(mean_imse)
+  
+}
 
 
 

@@ -20,47 +20,19 @@ library(reshape2)
 do_setting <- 3 # settings 1, 2, or 3
 
 # Extra observation error for X (after data generation):
-# X_sd_error <- 0
-X_sd_error <- 0.2
+X_sd_error <- 0
+# X_sd_error <- 0.2
 
-# Settings ----------------------------------------------------------------
-
-mean_imse_by_row <- function(func_true,
-                             func_hat,
-                             argvals){
-  
-  interval_length <- (max(argvals) - min(argvals))
-  
-  beta_diff_sq <- (func_true - func_hat)^2
-  
-  num_obs <- nrow(func_true)
-  
-  imse_by_row <- array(NA, dim = num_obs)
-  
-  for (row_argval in 1:nrow(func_true)) {
-    
-    imse_by_row[row_argval] <- (num_int_1d(argvals = argvals,
-                                           f_obs = beta_diff_sq[row_argval, ]))/interval_length
-  }
-  
-  
-  
-  mean_imse <- mean(imse_by_row)
-  
-  return(mean_imse)
-  
-}
 
 # Settings ----------------------------------------------------------------
 
 center <- TRUE
 
-
 # betas ids:
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 10
+num_lambdas <- 3
 
 lambdas_in_RS  <-  seq(-6, 8, length.out = num_lambdas)
 lambdas_in_RS  <-  10^(lambdas_in_RS)  
@@ -136,7 +108,7 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  30
+total_reps  <-  3
 rep_starts <- 1
 
 # number K of folds to do cross-validation:
