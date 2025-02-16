@@ -287,15 +287,6 @@ for(beta.num in num_betas)       {
     
     cat("    -> FFPLS model done\n")
     
-    best_lambdas <- rbind(
-      best_lambdas,
-      data.frame(lambda = cv_nonpen$best_penalties,
-                 method = "FFPLS",
-                 nComp = 1:max_nComp,
-                 beta.num = beta.num,
-                 rep_num = rep_num)
-    )
-    
     all_CVEs <- rbind(
       all_CVEs,
       data.frame(
