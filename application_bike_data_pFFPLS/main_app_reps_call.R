@@ -132,8 +132,8 @@ main_app_reps_call <- function(
 # Run the simulations -----------------------------------------------------
 
 
-global_num_lambdas = 10
-global_total_reps = 10
+global_num_lambdas = 20
+global_total_reps = 15
 
 
 main_app_reps_call(
@@ -141,11 +141,11 @@ main_app_reps_call(
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
   
-  LL =  10, # number of basis for Y(q)
-  KK = 10, # number of basis for X(p)
+  LL =  8, # number of basis for Y(q)
+  KK = 8, # number of basis for X(p)
   
   min_basis_for_opt = 6, # minimum number of basis for the optimization process
-  max_basis_for_opt = 20, # maximum number of basis for the optimization process
+  max_basis_for_opt = 40, # maximum number of basis for the optimization process
   
   max_nComp = 5 # maximum number of PLS components to compute
 )
