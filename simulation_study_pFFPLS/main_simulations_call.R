@@ -168,6 +168,9 @@ global_total_reps = 30
 main_simulations_call(
   do_setting = 1, 
   X_sd_error = 0, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
@@ -175,6 +178,9 @@ main_simulations_call(
 main_simulations_call(
   do_setting = 1, 
   X_sd_error = 0.2, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
@@ -185,6 +191,9 @@ main_simulations_call(
 main_simulations_call(
   do_setting = 2, 
   X_sd_error = 0, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
@@ -192,6 +201,9 @@ main_simulations_call(
 main_simulations_call(
   do_setting = 2, 
   X_sd_error = 0.2, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
@@ -202,6 +214,9 @@ main_simulations_call(
 main_simulations_call(
   do_setting = 3, 
   X_sd_error = 0, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
@@ -209,6 +224,9 @@ main_simulations_call(
 main_simulations_call(
   do_setting = 3, 
   X_sd_error = 0.2, 
+  
+  num_betas = c(2, 4),  # betas ids
+  
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps
 )
