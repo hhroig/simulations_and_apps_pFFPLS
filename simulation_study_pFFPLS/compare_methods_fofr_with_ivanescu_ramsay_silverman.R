@@ -4,7 +4,7 @@ library(viridis)
 library(ggpubr)
 library(scales)
 library(plotly)
-
+library(writexl)
 
 compare_methods_fun <- function(input_folder, 
                                 zoom_r2_lower = 0.5, 
@@ -197,6 +197,43 @@ compare_methods_fun <- function(input_folder,
     dir.create(out_folder_IMSE_CVEs)
   }
   
+  # Excel tables
+  
+  all_cves_summ <- all_cves %>%
+    group_by(method, nComp, beta.num) %>%
+    summarize(
+      mean_CVE = mean(CVE, na.rm = TRUE),
+      median_CVE = median(CVE, na.rm = TRUE),
+      sd_CVE = sd(CVE, na.rm = TRUE),
+      iqr_CVE = IQR(CVE, na.rm = TRUE)
+    )
+  write_xlsx(all_cves_summ, paste0(out_folder_IMSE_CVEs, "summary_training_cves.xlsx"))
+  
+  
+  all_imse_beta_summ <- all_final_res %>%
+    group_by(method, nComp, beta.num) %>%
+    summarize(
+      mean_IMSE = mean(imse, na.rm = TRUE),
+      median_IMSE = median(imse, na.rm = TRUE),
+      sd_IMSE = sd(imse, na.rm = TRUE),
+      iqr_IMSE = IQR(imse, na.rm = TRUE)
+    )
+  write_xlsx(all_imse_beta_summ, paste0(out_folder_IMSE_CVEs, "summary_imse_beta.xlsx"))
+  
+  
+  all_val_imse_summ <- all_final_res %>%
+    group_by(method, nComp, beta.num) %>%
+    summarize(
+      mean_mean_imse_Y_val  = mean(mean_imse_Y_val , na.rm = TRUE),
+      median_mean_imse_Y_val  = median(mean_imse_Y_val , na.rm = TRUE),
+      sd_mean_imse_Y_val  = sd(mean_imse_Y_val , na.rm = TRUE),
+      iqr_mean_imse_Y_val  = IQR(mean_imse_Y_val , na.rm = TRUE)
+    )
+  write_xlsx(all_val_imse_summ, paste0(out_folder_IMSE_CVEs, "summary_imse_val_y.xlsx"))
+  
+  
+  
+  # Plots
   
   for (beta_num in unique(all_final_res$beta.num)) {
     
@@ -484,7 +521,7 @@ compare_methods_fun <- function(input_folder,
       # Limit lower ylim for more details:
       
       p_r2_both_zoom <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
-                          aes(x = q, y = r2, color = method)) +
+                               aes(x = q, y = r2, color = method)) +
         facet_wrap(~partition) +
         geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
         ylab("R^2") +
@@ -532,7 +569,7 @@ compare_methods_fun <- function(input_folder,
                width = 12, height = 6 )
         
         p_r2_both_rough_zoom <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
-                                  aes(x = q, y = r2, color = method)) +
+                                       aes(x = q, y = r2, color = method)) +
           facet_wrap(~partition) +
           geom_line(linewidth = 1, alpha = 0.8)  +
           ylab("R^2") +
