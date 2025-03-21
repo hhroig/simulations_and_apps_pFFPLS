@@ -215,7 +215,7 @@ compare_methods_fun <- function(input_folder,
     p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                          aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
       geom_boxplot(position=position_dodge(0.8)) +
-      ylab( expression( "Validation: IMSE(Y)" )  ) +
+      ylab( expression( "Test: IMSE(Y)" )  ) +
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
@@ -256,7 +256,7 @@ compare_methods_fun <- function(input_folder,
     p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                              aes(x = nComp, y = log(mean_imse_Y_val, base = 10), fill = method)) +
       geom_boxplot( position=position_dodge(0.8) ) +
-      ylab(expression( "Validation: log { IMSE(Y) }" ) ) +
+      ylab(expression( "Test: log { IMSE(Y) }" ) ) +
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
