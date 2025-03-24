@@ -1,4 +1,6 @@
 application_gait_data_pFFPLS/results/
+application_bike_data_pFFPLS/results_bike/
+application_bike_data_pFFPLS/application_bike_data_pFFPLS.Rproj
 simulation_study_pFFPLS/results_simulations/
 simulation_study_pFFPLS/Rplots.pdf
 .Rproj.user
