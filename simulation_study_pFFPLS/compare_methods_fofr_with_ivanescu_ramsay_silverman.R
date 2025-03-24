@@ -190,9 +190,11 @@ compare_methods_fun <- function(input_folder,
   all_betas <- all_betas %>%
     mutate(nComp = as.factor(nComp))
   
+  if (nrow(all_best_num_bases_FFPLS) > 0) {
+    all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
+      mutate(nComp = as.factor(nComp)) 
+  }
   
-  all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
-    mutate(nComp = as.factor(nComp)) 
   
   
   # Limits:
@@ -205,10 +207,23 @@ compare_methods_fun <- function(input_folder,
   # IMSE + MSE --------------------------------------------------------------
   
   
-  out_folder_IMSE_CVEs <- paste0(out_folder, "IMSEs_CVEs/")
+  out_folder_IMSE_CVEs <- paste0(out_folder, "IMSEs_CVEs_Excel/")
   
   if (!dir.exists(out_folder_IMSE_CVEs)) {
     dir.create(out_folder_IMSE_CVEs)
+  }
+  
+  list_of_beta_paths = list()
+  
+  for (uniq_beta in unique(all_cves$beta.num)) {
+    
+    list_of_beta_paths[[uniq_beta]] <- paste0(out_folder, "IMSEs_CVEs_", 
+                                              beta_num_to_text(uniq_beta), "/")
+    
+    
+    if (!dir.exists(list_of_beta_paths[[uniq_beta]])) {
+      dir.create(list_of_beta_paths[[uniq_beta]])
+    }
   }
   
   # Excel tables
@@ -274,7 +289,7 @@ compare_methods_fun <- function(input_folder,
     p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                          aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
       geom_boxplot(position=position_dodge(0.8)) +
-      ylab( expression( "Validation: IMSE(Y)" )  ) +
+      ylab( expression( "Test: IMSE(Y)" )  ) +
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
@@ -290,21 +305,21 @@ compare_methods_fun <- function(input_folder,
     p_both <- grid.arrange(p_cve, p_imse_val, nrow = 1, bottom = leg)
     
     ggsave(p_both,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("train_cveY_val_imseY_beta", beta_num,".png")  ),
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_val_imseY_beta_", beta_num_to_text(beta_num),".png")  ),
            width = 16, height = 8 )
     ggsave(p_both,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("train_cveY_val_imseY_beta", beta_num,".pdf")  ),
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_val_imseY_beta_", beta_num_to_text(beta_num),".pdf")  ),
            width = 16, height = 8 )
     
     ggsave(p_imse,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("imse_beta", beta_num,".png")  ),
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("imse_beta_", beta_num_to_text(beta_num),".png")  ),
            width = 12, height = 8 )
     ggsave(p_imse,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("imse_beta", beta_num,".pdf")  ),
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("imse_beta_", beta_num_to_text(beta_num),".pdf")  ),
            width = 12, height = 8 )
     
     
@@ -333,7 +348,7 @@ compare_methods_fun <- function(input_folder,
     p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num),
                              aes(x = nComp, y = log(mean_imse_Y_val, base = 10), fill = method)) +
       geom_boxplot( position=position_dodge(0.8) ) +
-      ylab(expression( "Validation: log { IMSE(Y) }" ) ) +
+      ylab(expression( "Test: log { IMSE(Y) }" ) ) +
       xlab("# of components") +
       scale_fill_manual(values = color_codes) +
       theme_bw() +
@@ -348,30 +363,344 @@ compare_methods_fun <- function(input_folder,
     p_both_log <- grid.arrange(p_cve_log, p_imse_val_log, nrow = 1, bottom = leg)
     
     ggsave(p_both_log,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("train_cveY_val_imseY_log_beta", beta_num,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_val_imseY_log_beta_", beta_num_to_text(beta_num),
                                     ".pdf")  ),
            width = 16, height = 8 )
     ggsave(p_both_log,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("train_cveY_val_imseY_log_beta", beta_num,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_val_imseY_log_beta_", beta_num_to_text(beta_num),
                                     ".png")  ),
            width = 16, height = 8 )
     
     ggsave(p_imse_log,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("log_imse_beta", beta_num,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("log_imse_beta_", beta_num_to_text(beta_num),
                                     ".pdf")  ),
            width = 12, height = 8 )
     ggsave(p_imse_log,
-           filename = paste0(out_folder_IMSE_CVEs,
-                             paste0("log_imse_beta", beta_num,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("log_imse_beta_", beta_num_to_text(beta_num),
                                     ".png")  ),
            width = 12, height = 8 )
     
     
     
   } # loop "beta.num"
+  
+  
+  # Disaggregated (original scale)
+  
+  for (beta_num in unique(all_final_res$beta.num)) {
+    
+    p_cve <- ggplot(all_cves %>% 
+                      filter(beta.num == beta_num,
+                             str_detect(method, "PLS" )),
+                    aes(x = nComp, y = CVE, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8))  +
+      ylab("Training: CVE(Y)") +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes)+
+      theme_bw()  +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_", beta_num_to_text(beta_num),".png")  ),
+           width = 8, height = 8 )
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_", beta_num_to_text(beta_num),".pdf")  ),
+           width = 8, height = 8 )
+    
+    
+    for (opt_comp in unique(all_final_res$nComp)) {
+      
+      # IMSE on Beta
+      
+      p_imse <- ggplot(all_final_res %>% 
+                         filter(beta.num == beta_num, 
+                                nComp == opt_comp),
+                       aes(x = method, y = imse, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( "IMSE(" * beta *")" )  ) +
+        xlab("") +
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20))+
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components")) 
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      # IMSE on test set Y
+      
+      p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
+                                                     nComp == opt_comp),
+                           aes(x = method, y = mean_imse_Y_val, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( "Test: IMSE(Y)" )  ) +
+        xlab("") +
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20)) +
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components"))
+      
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      
+    } # end beta loop on original scale
+  } # end beta loop on original scale
+  
+  
+  
+  # Disaggregated (original scale and then log)
+  
+  for (beta_num in unique(all_final_res$beta.num)) {
+    
+    
+    # Original scale-------
+    
+    p_cve <- ggplot(all_cves %>% 
+                      filter(beta.num == beta_num,
+                             str_detect(method, "PLS" )),
+                    aes(x = nComp, y = CVE, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8))  +
+      ylab("Training: CVE(Y)") +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes)+
+      theme_bw()  +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_", beta_num_to_text(beta_num),".png")  ),
+           width = 8, height = 8 )
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_cveY_", beta_num_to_text(beta_num),".pdf")  ),
+           width = 8, height = 8 )
+    
+    
+    for (opt_comp in unique(all_final_res$nComp)) {
+      
+      # IMSE on Beta
+      
+      p_imse <- ggplot(all_final_res %>% 
+                         filter(beta.num == beta_num, 
+                                nComp == opt_comp),
+                       aes(x = method, y = imse, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( "IMSE(" * beta *")" )  ) +
+        xlab("") +
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20))+
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components")) 
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      # IMSE on test set Y
+      
+      p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
+                                                     nComp == opt_comp),
+                           aes(x = method, y = mean_imse_Y_val, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( "Test: IMSE(Y)" )  ) +
+        xlab("") +
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20)) +
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components"))
+      
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      
+    } # end loop on n components
+    
+    
+    
+    # Log scale-------
+    
+    
+    p_cve <- ggplot(all_cves %>% 
+                      filter(beta.num == beta_num,
+                             str_detect(method, "PLS" )),
+                    aes(x = nComp, y = CVE, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8))  +
+      scale_y_log10() +  # Log-10 scale transformation
+      ylab("Training: log{CVE(Y)}") +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes)+
+      theme_bw()  +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_log_cveY_", beta_num_to_text(beta_num),".png")  ),
+           width = 8, height = 8 )
+    
+    ggsave(p_cve,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("train_log_cveY_", beta_num_to_text(beta_num),".pdf")  ),
+           width = 8, height = 8 )
+    
+    
+    for (opt_comp in unique(all_final_res$nComp)) {
+      
+      # IMSE on Beta
+      
+      p_imse <- ggplot(all_final_res %>% 
+                         filter(beta.num == beta_num, 
+                                nComp == opt_comp),
+                       aes(x = method, y = imse, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( " log{ IMSE(" * beta *") }" )  ) +
+        xlab("") +
+        scale_y_log10() +  # Log-10 scale transformation
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20))+
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components")) 
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("log_imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("log_imse_beta_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      # IMSE on test set Y
+      
+      p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
+                                                     nComp == opt_comp),
+                           aes(x = method, y = mean_imse_Y_val, fill = method)) +
+        geom_boxplot(position=position_dodge(0.8)) +
+        ylab( expression( "Test: log { IMSE(Y) }" )  ) +
+        scale_y_log10() +  # Log-10 scale transformation
+        xlab("") +
+        scale_fill_manual(values = color_codes) +
+        theme_bw() +
+        theme(legend.position="none", text = element_text(size = 20)) +
+        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components"))
+      
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("log_imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".png")  ),
+             width = 8, height = 8 )
+      
+      ggsave(p_imse_val,
+             filename = paste0(list_of_beta_paths[[beta_num]],
+                               paste0("log_imseY_", 
+                                      beta_num_to_text(beta_num), 
+                                      "_ncomp", 
+                                      opt_comp,
+                                      ".pdf")   ),
+             width = 8, height = 8 )
+      
+      
+      
+    } # end loop on n components
+    
+    
+    
+    
+    
+  } # end beta loop on original and log scales
   
   
   
@@ -429,6 +758,12 @@ compare_methods_fun <- function(input_folder,
     
     
   } # loop "beta.num"
+  
+  # Save as Excel file to report a single repetition:
+  
+  rownames(all_computation_times) <- NULL
+  
+  write_xlsx(all_computation_times, paste0(out_folder_computation_times, "all_computation_times.xlsx"))
   
   
   
@@ -489,6 +824,20 @@ compare_methods_fun <- function(input_folder,
   }
   
   
+  out_folder_R2_train_test <- paste0(out_folder, "R2_smooth_train_test/")
+  
+  if (!dir.exists(out_folder_R2)) {
+    dir.create(out_folder_R2)
+  }
+  
+  
+  out_folder_R2_rough_train_test <- paste0(out_folder, "R2_rough_train_test/")
+  
+  if (!dir.exists(out_folder_R2_rough)) {
+    dir.create(out_folder_R2_rough)
+  }
+  
+  
   summ_all_r2 <- all_best_r2 %>%
     as_tibble() %>%
     mutate(method = factor(method, levels = c("FFPLS",
@@ -498,19 +847,21 @@ compare_methods_fun <- function(input_folder,
                                               "pFFR_RS",
                                               "True Beta") )) %>%
     group_by(method, beta.num, nComp, q) %>%
-    summarise(Training = mean(R2_train), Validation = mean(R2_val))
+    summarise(Training = mean(R2_train), Test = mean(R2_val))
   
   summ_all_r2_long <- summ_all_r2 %>%
-    pivot_longer(cols = c(Training, Validation),
+    pivot_longer(cols = c(Training, Test),
                  names_to = "partition",
                  values_to = "r2")
+  
   
   for ( n_comps_loop in unique(summ_all_r2$nComp) ){
     
     for (beta_num in unique(summ_all_r2$beta.num)) {
       
       
-      p_r2_both <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
+      p_r2_both <- ggplot(summ_all_r2_long %>% 
+                            filter(beta.num == beta_num, nComp == n_comps_loop),
                           aes(x = q, y = r2, color = method)) +
         facet_wrap(~partition) +
         geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
@@ -525,11 +876,11 @@ compare_methods_fun <- function(input_folder,
       
       ggsave(p_r2_both,
              filename = paste0(out_folder_R2,
-                               paste0("R2_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+                               paste0("R2_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
              width = 12, height = 6 )
       ggsave(p_r2_both,
              filename = paste0(out_folder_R2,
-                               paste0("R2_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+                               paste0("R2_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
              width = 12, height = 6 )
       
       # Limit lower ylim for more details:
@@ -549,11 +900,11 @@ compare_methods_fun <- function(input_folder,
       
       ggsave(p_r2_both_zoom,
              filename = paste0(out_folder_R2,
-                               paste0("R2_zoom_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+                               paste0("R2_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
              width = 12, height = 6 )
       ggsave(p_r2_both_zoom,
              filename = paste0(out_folder_R2,
-                               paste0("R2_zoom_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+                               paste0("R2_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
              width = 12, height = 6 )
       
       
@@ -575,11 +926,11 @@ compare_methods_fun <- function(input_folder,
         
         ggsave(p_r2_both_rough,
                filename = paste0(out_folder_R2_rough,
-                                 paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+                                 paste0("R2_rough_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
                width = 12, height = 6 )
         ggsave(p_r2_both_rough,
                filename = paste0(out_folder_R2_rough,
-                                 paste0("R2_rough_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+                                 paste0("R2_rough_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
                width = 12, height = 6 )
         
         p_r2_both_rough_zoom <- ggplot(summ_all_r2_long %>% filter(beta.num == beta_num, nComp == n_comps_loop),
@@ -597,11 +948,11 @@ compare_methods_fun <- function(input_folder,
         
         ggsave(p_r2_both_rough_zoom,
                filename = paste0(out_folder_R2_rough,
-                                 paste0("R2_rough_zoom_beta", beta_num, "_nComp", n_comps_loop,".png")  ),
+                                 paste0("R2_rough_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
                width = 12, height = 6 )
         ggsave(p_r2_both_rough_zoom,
                filename = paste0(out_folder_R2_rough,
-                                 paste0("R2_rough_zoom_beta", beta_num, "_nComp", n_comps_loop,".pdf")  ),
+                                 paste0("R2_rough_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
                width = 12, height = 6 )
         
       } # if do_rough_r2
@@ -609,7 +960,140 @@ compare_methods_fun <- function(input_folder,
       
     } # loop R^2
     
-  }
+  } # loop ncomponents
+  
+  
+  
+  # Repeat each train/test graph separately
+  
+  for ( n_comps_loop in unique(summ_all_r2$nComp) ){
+    
+    for (beta_num in unique(summ_all_r2$beta.num)) {
+      
+      for (partition_out in unique(summ_all_r2_long$partition)) {
+        
+        
+        p_r2_partition <- ggplot(summ_all_r2_long %>% 
+                               filter(beta.num == beta_num, 
+                                      nComp == n_comps_loop,
+                                      partition == partition_out),
+                             aes(x = q, y = r2, color = method)) +
+          geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
+          ylab("R^2") +
+          xlab("q") +
+          scale_color_manual(values = color_codes)+
+          ylim(0, 1) +
+          theme_bw()  +
+          theme(legend.position="bottom", text = element_text(size = 20)) +
+          labs(color = "")
+        
+        
+        ggsave(p_r2_partition,
+               filename = paste0(out_folder_R2_train_test,
+                                 paste0("R2_", partition_out, 
+                                        "_beta_", beta_num_to_text(beta_num), 
+                                        "_nComp", n_comps_loop,".png")  ),
+               width = 12, height = 6 )
+        ggsave(p_r2_partition,
+               filename = paste0(out_folder_R2_train_test,
+                                 paste0("R2_", partition_out, 
+                                        "_beta_", beta_num_to_text(beta_num),
+                                        "_nComp", n_comps_loop,".pdf")  ),
+               width = 12, height = 6 )
+        
+        # Limit lower ylim for more details:
+        
+        p_r2_partition_zoom <- ggplot(summ_all_r2_long %>% 
+                                   filter(beta.num == beta_num, 
+                                          nComp == n_comps_loop,
+                                          partition == partition_out),
+                                 aes(x = q, y = r2, color = method)) +
+          geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
+          ylab("R^2") +
+          xlab("q") +
+          scale_color_manual(values = color_codes)+
+          ylim(zoom_r2_lower, 1) +
+          theme_bw()  +
+          theme(legend.position="bottom", text = element_text(size = 20)) +
+          labs(color = "")
+        
+        
+        ggsave(p_r2_partition_zoom,
+               filename = paste0(out_folder_R2_train_test,
+                                 paste0("R2_zoom_", partition_out, 
+                                        "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
+               width = 12, height = 6 )
+        ggsave(p_r2_partition_zoom,
+               filename = paste0(out_folder_R2_train_test,
+                                 paste0("R2_zoom_", partition_out, 
+                                        "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
+               width = 12, height = 6 )
+        
+        
+        
+        
+        if (do_rough_r2) {
+          
+          p_r2_both_rough <- ggplot(summ_all_r2_long %>% 
+                                      filter(beta.num == beta_num, 
+                                             nComp == n_comps_loop,
+                                             partition == partition_out),
+                                    aes(x = q, y = r2, color = method)) +
+            geom_line(linewidth = 1, alpha = 0.8)  +
+            ylab("R^2") +
+            xlab("q") +
+            scale_color_manual(values = color_codes)+
+            ylim(0, 1) +
+            theme_bw()  +
+            theme(legend.position="bottom", text = element_text(size = 20)) +
+            labs(color = "")
+          
+          
+          ggsave(p_r2_both_rough,
+                 filename = paste0(out_folder_R2_rough_train_test,
+                                   paste0("R2_rough_", partition_out, 
+                                          "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
+                 width = 12, height = 6 )
+          ggsave(p_r2_both_rough,
+                 filename = paste0(out_folder_R2_rough_train_test,
+                                   paste0("R2_rough_", partition_out, 
+                                          "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
+                 width = 12, height = 6 )
+          
+          p_r2_both_rough_zoom <- ggplot(summ_all_r2_long %>% 
+                                           filter(beta.num == beta_num,
+                                                  nComp == n_comps_loop,
+                                                  partition == partition_out),
+                                         aes(x = q, y = r2, color = method)) +
+            geom_line(linewidth = 1, alpha = 0.8)  +
+            ylab("R^2") +
+            xlab("q") +
+            scale_color_manual(values = color_codes)+
+            ylim(zoom_r2_lower, 1) +
+            theme_bw()  +
+            theme(legend.position="bottom", text = element_text(size = 20)) +
+            labs(color = "")
+          
+          
+          ggsave(p_r2_both_rough_zoom,
+                 filename = paste0(out_folder_R2_rough_train_test,
+                                   paste0("R2_rough_", partition_out, 
+                                          "_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
+                 width = 12, height = 6 )
+          ggsave(p_r2_both_rough_zoom,
+                 filename = paste0(out_folder_R2_rough_train_test,
+                                   paste0("R2_rough_", partition_out, 
+                                          "_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
+                 width = 12, height = 6 )
+          
+        } # if do_rough_r2
+        
+        
+        
+      } # loop in partition
+    } # loop R^2
+    
+  } # loop ncomponents
   
   
   # Betas -------------------------------------------------------------------
@@ -687,7 +1171,7 @@ compare_methods_fun <- function(input_folder,
     
     for (n.Beta in unique(summ_all_betas$beta.num)) {
       
-      out_folder_mean_betas <- paste0(out_folder, "mean_betas_", n.Beta, "/")
+      out_folder_mean_betas <- paste0(out_folder, "mean_beta_", beta_num_to_text(n.Beta), "/")
       
       if (!dir.exists(out_folder_mean_betas)) {
         dir.create(out_folder_mean_betas)
@@ -906,7 +1390,7 @@ compare_methods_fun <- function(input_folder,
     
     for (n.Beta in unique(summ_all_betas$beta.num)) {
       
-      out_folder_mean_betas <- paste0(out_folder, "3DBeta", n.Beta, "/")
+      out_folder_mean_betas <- paste0(out_folder, "3D", beta_num_to_text(n.Beta), "/")
       
       if (!dir.exists(out_folder_mean_betas)) {
         dir.create(out_folder_mean_betas)
