@@ -1,5 +1,6 @@
 application_gait_data_pFFPLS/results/
 simulation_study_pFFPLS/results_simulations/
+simulation_study_pFFPLS/Rplots.pdf
 .Rproj.user
 .Rhistory
 .RData

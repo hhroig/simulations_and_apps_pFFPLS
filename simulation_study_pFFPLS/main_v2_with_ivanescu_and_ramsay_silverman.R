@@ -19,33 +19,10 @@ library(reshape2)
 
 do_setting <- 3 # settings 1, 2, or 3
 
-# Settings ----------------------------------------------------------------
+# Extra observation error for X (after data generation):
+X_sd_error <- 0
+# X_sd_error <- 0.2
 
-mean_imse_by_row <- function(func_true,
-                             func_hat,
-                             argvals){
-  
-  interval_length <- (max(argvals) - min(argvals))
-  
-  beta_diff_sq <- (func_true - func_hat)^2
-  
-  num_obs <- nrow(func_true)
-  
-  imse_by_row <- array(NA, dim = num_obs)
-  
-  for (row_argval in 1:nrow(func_true)) {
-    
-    imse_by_row[row_argval] <- (num_int_1d(argvals = argvals,
-                                           f_obs = beta_diff_sq[row_argval, ]))/interval_length
-  }
-  
-  
-  
-  mean_imse <- mean(imse_by_row)
-  
-  return(mean_imse)
-  
-}
 
 # Settings ----------------------------------------------------------------
 
@@ -55,12 +32,19 @@ center <- TRUE
 num_betas <- c(1, 3)
 
 # length of the penalties grid:
-num_lambdas <- 10
-lambdas_in  <-  seq(-6, 12, length.out = num_lambdas)
+num_lambdas <- 3
+
+lambdas_in_RS  <-  seq(-6, 8, length.out = num_lambdas)
+lambdas_in_RS  <-  10^(lambdas_in_RS)  
+
+lambdas_in  <-  seq(-2, 12, length.out = num_lambdas)
 lambdas_in  <-  10^(lambdas_in)
 
 penaltyvec_X <- lambdas_in
 penaltyvec_Y <- lambdas_in
+
+penaltyvec_X_RS <- lambdas_in_RS
+penaltyvec_Y_RS <- lambdas_in_RS
 
 # Number of observation nodes:
 nnodesX <- 100
@@ -74,9 +58,12 @@ argvals_Y <- seq(0, 1, length.out = nnodesY) # q
 
 # # Setting 1:
 if (do_setting == 1) {
-  LL <- 5 # number of basis for Y(q)
-  KK <- 5 # number of basis for X(p)
+  LL <- 7 # number of basis for Y(q)
+  KK <- 7 # number of basis for X(p)
   do_opt_bases_FFPLS = FALSE
+  
+  # number of PLS components to compute:
+  max_nComp <- 6
 }
 
 
@@ -85,6 +72,9 @@ if (do_setting == 2) {
   LL <- 40 # number of basis for Y(q)
   KK <- 40 # number of basis for X(p)
   do_opt_bases_FFPLS = FALSE
+  
+  # number of PLS components to compute:
+  max_nComp <- 8
 }
 
 
@@ -95,11 +85,19 @@ if (do_setting == 3) {
   LL <- 40 # number of basis for Y(q)
   KK <- 40 # number of basis for X(p)
   
+  # number of PLS components to compute:
+  max_nComp <- 8
+  
   LL_list <- round(seq(9, 40, length.out = num_lambdas)) # list of number of bases for Y(q)
   KK_list <- LL_list                                     # list of number of bases for X(p)
   do_opt_bases_FFPLS = TRUE
 }
 
+
+# Number of basis for Ramsay and Silverman
+# KK_rs = LL_rs = 5
+KK_rs = KK
+LL_rs = LL
 
 
 # B-spline basis:
@@ -110,11 +108,8 @@ basisobj_Y <- fda::create.bspline.basis(rangeval = range(argvals_Y),
 
 
 # number of repetitions (total_reps - rep_starts)
-total_reps  <-  30
+total_reps  <-  3
 rep_starts <- 1
-
-# number of PLS components to compute:
-max_nComp <- 8
 
 # number K of folds to do cross-validation:
 num_folds <- 5
@@ -128,11 +123,12 @@ if (!dir.exists( paste0(shared_folder, "results_simulations/")) ) {
 out_folder <- paste0(shared_folder,
                      "results_simulations/",
                      "set", do_setting,
-                     "_reps", 
+                     ifelse(X_sd_error > 0, "e", ""),
+                     "_rep", 
                      total_reps, 
                      "_pen", 
                      length(penaltyvec_X)*length(penaltyvec_Y),
-                     "_K", KK, "_L", LL,
+                     "_K", KK, "L", LL,
                      "/")
 
 
@@ -144,12 +140,20 @@ if (!dir.exists(out_folder)) {
 
 # Call the actual simulations ----------------------------------------------
 
+
+# Source the wrappers for R&S' method coded in fda.usc 
+source("cv_penalties_fregre.basis.fr.R")
+source("predict_fregre_fr.R")
+
 library(doParallel)
 nodes_CL = detectCores()   # Detect number of cores to use
 cl = makeCluster(nodes_CL) # Specify number of threads here
+
+clusterExport(cl, c("predict_fregre_fr"))
+
 registerDoParallel(cl)
 
-source("simulations_fofr_v2_with_ivanescus.R", local = TRUE)
+source("simulations_fofr_v2_with_ivanescus_ramsay_silverman.R", local = TRUE)
 
 stopCluster(cl)
 
@@ -157,7 +161,7 @@ stopCluster(cl)
 # Plot comparisons --------------------------------------------------------
 
 
-source("compare_methods_fofr_with_ivanescu.R", local = TRUE)
+source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R", local = TRUE)
 
 compare_methods_fun(input_folder = out_folder)
 
