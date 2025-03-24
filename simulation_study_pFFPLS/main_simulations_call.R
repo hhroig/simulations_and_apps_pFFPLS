@@ -161,7 +161,9 @@ main_simulations_call <- function(
 
 
 global_num_lambdas = 10
-global_total_reps = 30
+global_total_reps = 60
+global_start_reps = 31
+global_betas = 1:4
 
 
 # Setting 1:
@@ -169,44 +171,48 @@ main_simulations_call(
   do_setting = 1, 
   X_sd_error = 0, 
   
-  num_betas = c(2, 4),  # betas ids
+  num_betas = global_betas,  # betas ids
   
   num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
+  total_reps  = global_total_reps,
+  rep_starts = global_start_reps
 )
 
 main_simulations_call(
   do_setting = 1, 
   X_sd_error = 0.2, 
   
-  num_betas = c(2, 4),  # betas ids
+  num_betas = global_betas,  # betas ids
   
   num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
+  total_reps  = global_total_reps,
+  rep_starts = global_start_reps
 )
 
 
-
-# Setting 2:
-main_simulations_call(
-  do_setting = 2, 
-  X_sd_error = 0, 
-  
-  num_betas = c(2, 4),  # betas ids
-  
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
-)
-
-main_simulations_call(
-  do_setting = 2, 
-  X_sd_error = 0.2, 
-  
-  num_betas = c(2, 4),  # betas ids
-  
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
-)
+# 
+# # Setting 2:
+# main_simulations_call(
+#   do_setting = 2, 
+#   X_sd_error = 0, 
+#   
+#   num_betas = global_betas,  # betas ids
+#   
+#   num_lambdas = global_num_lambdas, 
+#   total_reps  = global_total_reps,
+#   rep_starts = global_start_reps
+# )
+# 
+# main_simulations_call(
+#   do_setting = 2, 
+#   X_sd_error = 0.2, 
+#   
+#   num_betas = global_betas,  # betas ids
+#   
+#   num_lambdas = global_num_lambdas, 
+#   total_reps  = global_total_reps,
+#   rep_starts = global_start_reps
+# )
 
 
 
@@ -215,18 +221,20 @@ main_simulations_call(
   do_setting = 3, 
   X_sd_error = 0, 
   
-  num_betas = c(2, 4),  # betas ids
+  num_betas = global_betas,  # betas ids
   
   num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
+  total_reps  = global_total_reps,
+  rep_starts = global_start_reps
 )
 
 main_simulations_call(
   do_setting = 3, 
   X_sd_error = 0.2, 
   
-  num_betas = c(2, 4),  # betas ids
+  num_betas = global_betas,  # betas ids
   
   num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps
+  total_reps  = global_total_reps,
+  rep_starts = global_start_reps
 )
