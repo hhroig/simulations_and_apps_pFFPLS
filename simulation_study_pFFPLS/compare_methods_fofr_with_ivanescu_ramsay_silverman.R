@@ -6,6 +6,20 @@ library(scales)
 library(plotly)
 library(writexl)
 
+beta_num_to_text <- function(beta_num_in) {
+  if (beta_num_in == 1) {
+    beta_txt = "sym" # symmetrical function
+  }else if (beta_num_in == 2) {
+    beta_txt = "exp" # single exponential top right corner
+  }else if (beta_num_in == 3) {
+    beta_txt = "sad" # a horse saddle
+  }else if (beta_num_in == 4) {
+    beta_txt = "dbl" # a double exponential top right and bottom left
+  }
+  
+  
+}
+
 compare_methods_fun <- function(input_folder, 
                                 zoom_r2_lower = 0.5, 
                                 do_rough_r2 = TRUE){
