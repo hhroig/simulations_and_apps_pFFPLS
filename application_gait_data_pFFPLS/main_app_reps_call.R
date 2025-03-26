@@ -84,7 +84,7 @@ main_app_reps_call <- function(
                                           nbasis = LL)
   
   # Output folder:
-  out_folder <- paste0("results_bike/",
+  out_folder <- paste0("results_gait/",
                        "reps", 
                        total_reps, 
                        "_pen", 
@@ -151,13 +151,15 @@ main_app_reps_call <- function(
 
 # Run the simulations -----------------------------------------------------
 
+data_Rdata_path = "gait_data/gait_orig.RData"
 
-global_num_lambdas = 20
-global_total_reps = 100
+
+global_num_lambdas = 5
+global_total_reps = 3
 
 
 main_app_reps_call(
-  data_Rdata_path = "bike_data/bike_orig.RData",
+  data_Rdata_path = data_Rdata_path,
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
   
@@ -167,12 +169,12 @@ main_app_reps_call(
   min_basis_for_opt = 7, # minimum number of basis for the optimization process
   max_basis_for_opt = 40, # maximum number of basis for the optimization process
   
-  max_nComp = 7 # maximum number of PLS components to compute
+  max_nComp = 5 # maximum number of PLS components to compute
 )
 
 
 main_app_reps_call(
-  data_Rdata_path = "bike_data/bike_orig.RData",
+  data_Rdata_path = data_Rdata_path,
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
   
@@ -182,12 +184,12 @@ main_app_reps_call(
   min_basis_for_opt = 7, # minimum number of basis for the optimization process
   max_basis_for_opt = 40, # maximum number of basis for the optimization process
   
-  max_nComp = 7 # maximum number of PLS components to compute
+  max_nComp = 5 # maximum number of PLS components to compute
 )
 
 
 main_app_reps_call(
-  data_Rdata_path = "bike_data/bike_orig.RData",
+  data_Rdata_path = data_Rdata_path,
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
   
@@ -197,5 +199,5 @@ main_app_reps_call(
   min_basis_for_opt = 7, # minimum number of basis for the optimization process
   max_basis_for_opt = 40, # maximum number of basis for the optimization process
   
-  max_nComp = 7 # maximum number of PLS components to compute
+  max_nComp = 5 # maximum number of PLS components to compute
 )
