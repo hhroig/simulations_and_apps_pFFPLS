@@ -243,7 +243,7 @@ for(rep_num in rep_starts:total_reps)  {
       beta.num = beta.num,
       nComp = 1:max_nComp,
       rep_num = rep_num,
-      elapsed_time = cv_penalized$elapsed
+      elapsed_time = time_penalized[["elapsed"]]
     )
   )
   
@@ -294,7 +294,7 @@ for(rep_num in rep_starts:total_reps)  {
       beta.num = beta.num,
       nComp = 1:max_nComp,
       rep_num = rep_num,
-      elapsed_time = cv_nonpen$elapsed
+      elapsed_time = time_nonpen[["elapsed"]]
     )
   )
   
@@ -358,7 +358,7 @@ for(rep_num in rep_starts:total_reps)  {
         beta.num = beta.num,
         nComp = 1:max_nComp,
         rep_num = rep_num,
-        elapsed_time = cv_nonpen_bases$elapsed
+        elapsed_time = time_nonpen_bases[["elapsed"]]
       )
     )
     
