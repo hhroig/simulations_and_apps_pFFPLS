@@ -826,15 +826,15 @@ compare_methods_fun <- function(input_folder,
   
   out_folder_R2_train_test <- paste0(out_folder, "R2_smooth_train_test/")
   
-  if (!dir.exists(out_folder_R2)) {
-    dir.create(out_folder_R2)
+  if (!dir.exists(out_folder_R2_train_test)) {
+    dir.create(out_folder_R2_train_test)
   }
   
   
   out_folder_R2_rough_train_test <- paste0(out_folder, "R2_rough_train_test/")
   
-  if (!dir.exists(out_folder_R2_rough)) {
-    dir.create(out_folder_R2_rough)
+  if (!dir.exists(out_folder_R2_rough_train_test)) {
+    dir.create(out_folder_R2_rough_train_test)
   }
   
   
@@ -993,13 +993,13 @@ compare_methods_fun <- function(input_folder,
                                  paste0("R2_", partition_out, 
                                         "_beta_", beta_num_to_text(beta_num), 
                                         "_nComp", n_comps_loop,".png")  ),
-               width = 12, height = 6 )
+               width = 8, height = 6 )
         ggsave(p_r2_partition,
                filename = paste0(out_folder_R2_train_test,
                                  paste0("R2_", partition_out, 
                                         "_beta_", beta_num_to_text(beta_num),
                                         "_nComp", n_comps_loop,".pdf")  ),
-               width = 12, height = 6 )
+               width = 8, height = 6 )
         
         # Limit lower ylim for more details:
         
@@ -1022,12 +1022,12 @@ compare_methods_fun <- function(input_folder,
                filename = paste0(out_folder_R2_train_test,
                                  paste0("R2_zoom_", partition_out, 
                                         "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
-               width = 12, height = 6 )
+               width = 8, height = 6 )
         ggsave(p_r2_partition_zoom,
                filename = paste0(out_folder_R2_train_test,
                                  paste0("R2_zoom_", partition_out, 
                                         "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
-               width = 12, height = 6 )
+               width = 8, height = 6 )
         
         
         
@@ -1053,12 +1053,12 @@ compare_methods_fun <- function(input_folder,
                  filename = paste0(out_folder_R2_rough_train_test,
                                    paste0("R2_rough_", partition_out, 
                                           "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
-                 width = 12, height = 6 )
+                 width = 8, height = 6 )
           ggsave(p_r2_both_rough,
                  filename = paste0(out_folder_R2_rough_train_test,
                                    paste0("R2_rough_", partition_out, 
                                           "_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
-                 width = 12, height = 6 )
+                 width = 8, height = 6 )
           
           p_r2_both_rough_zoom <- ggplot(summ_all_r2_long %>% 
                                            filter(beta.num == beta_num,
@@ -1079,12 +1079,12 @@ compare_methods_fun <- function(input_folder,
                  filename = paste0(out_folder_R2_rough_train_test,
                                    paste0("R2_rough_", partition_out, 
                                           "_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".png")  ),
-                 width = 12, height = 6 )
+                 width = 8, height = 6 )
           ggsave(p_r2_both_rough_zoom,
                  filename = paste0(out_folder_R2_rough_train_test,
                                    paste0("R2_rough_", partition_out, 
                                           "_zoom_beta_", beta_num_to_text(beta_num), "_nComp", n_comps_loop,".pdf")  ),
-                 width = 12, height = 6 )
+                 width = 8, height = 6 )
           
         } # if do_rough_r2
         
