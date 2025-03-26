@@ -156,7 +156,7 @@ data_Rdata_path = "gait_data/gait_orig.RData"
 center = FALSE
 
 global_num_lambdas = 10
-global_total_reps = 10
+global_total_reps = 100
 
 
 main_app_reps_call(
