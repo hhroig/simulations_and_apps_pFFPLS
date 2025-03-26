@@ -11,7 +11,7 @@ library(doParallel)
 
 
 main_app_reps_call <- function(
-    
+  
   data_Rdata_path, # path to the RData file with the data (X_orig, Y_orig)
   
   validation_percet = 0.15, # percentage of the data to be used for validation
@@ -98,6 +98,26 @@ main_app_reps_call <- function(
   
   
   
+  
+  # Plot some reference curves ----------------------------------------------
+  
+  # Output folder:
+  out_folder_ref_plot <- paste0(out_folder, "X_Y_plots/")
+  
+  if (!dir.exists(out_folder_ref_plot)) {
+    dir.create(out_folder_ref_plot)
+  }
+  
+  source("plot_X_Y_curves.R")
+  
+  plot_X_Y_curves(X = X_orig, 
+                  Y = Y_orig, 
+                  argvals_X = argvals_X, 
+                  argvals_Y = argvals_Y, 
+                  out_folder_ref_plot = out_folder_ref_plot,
+                  num_obs_to_plot = 20)
+  
+  
   # Call the actual simulations ----------------------------------------------
   
   
@@ -121,7 +141,7 @@ main_app_reps_call <- function(
   
   
   source("compare_methods_repeated_app.R", local = TRUE)
-
+  
   compare_methods_fun(input_folder = out_folder)
   
   
