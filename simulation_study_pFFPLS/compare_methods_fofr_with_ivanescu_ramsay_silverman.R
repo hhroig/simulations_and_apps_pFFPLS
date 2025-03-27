@@ -8,21 +8,25 @@ library(writexl)
 
 beta_num_to_text <- function(beta_num_in) {
   if (beta_num_in == 1) {
-    beta_txt = "sym" # symmetrical function
+    beta_txt = "symm" # symmetrical function
   }else if (beta_num_in == 2) {
     beta_txt = "exp" # single exponential top right corner
   }else if (beta_num_in == 3) {
-    beta_txt = "sad" # a horse saddle
+    beta_txt = "saddle" # a horse saddle
   }else if (beta_num_in == 4) {
-    beta_txt = "dbl" # a double exponential top right and bottom left
+    beta_txt = "dbl_exp" # a double exponential top right and bottom left
   }
   
+  return(beta_txt)
   
 }
 
 compare_methods_fun <- function(input_folder, 
-                                zoom_r2_lower = 0.5, 
-                                do_rough_r2 = TRUE){
+                                zoom_r2_lower = 0, 
+                                do_rough_r2 = TRUE,
+                                theta = 30,   # Angle for viewing (rotation beta surface)
+                                phi = 30    # Angle for viewing (tilt beta surface)
+                                ){
   
   out_folder <- paste0(input_folder, "results_plots/")
   
@@ -377,19 +381,19 @@ compare_methods_fun <- function(input_folder,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("log_imse_beta_", beta_num_to_text(beta_num),
                                     ".pdf")  ),
-           width = 12, height = 8 )
+           width = 12, height = 6 )
     ggsave(p_imse_log,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("log_imse_beta_", beta_num_to_text(beta_num),
                                     ".png")  ),
-           width = 12, height = 8 )
+           width = 12, height = 6 )
     
     
     
   } # loop "beta.num"
   
   
-  # Disaggregated (original scale)
+  ### Disaggregated (original scale) -----
   
   for (beta_num in unique(all_final_res$beta.num)) {
     
@@ -408,13 +412,38 @@ compare_methods_fun <- function(input_folder,
     
     ggsave(p_cve,
            filename = paste0(list_of_beta_paths[[beta_num]],
-                             paste0("train_cveY_", beta_num_to_text(beta_num),".png")  ),
-           width = 8, height = 8 )
+                             paste0("train_PLS_cveY_", beta_num_to_text(beta_num),".png")  ),
+           width = 12, height = 6 )
     
     ggsave(p_cve,
            filename = paste0(list_of_beta_paths[[beta_num]],
-                             paste0("train_cveY_", beta_num_to_text(beta_num),".pdf")  ),
-           width = 8, height = 8 )
+                             paste0("train_PLS_cveY_", beta_num_to_text(beta_num),".pdf")  ),
+           width = 12, height =6 )
+    
+    
+    
+    p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num,
+                                                   str_detect(method, "PLS")  ),
+                         aes(x = nComp, y = mean_imse_Y_val, fill = method)) +
+      geom_boxplot(position=position_dodge(0.8)) +
+      ylab( expression( "Test: IMSE(Y)" )  ) +
+      xlab("# of components") +
+      scale_fill_manual(values = color_codes) +
+      theme_bw() +
+      theme(legend.position="bottom", text = element_text(size = 20)) +
+      labs(fill = "")
+    
+    
+    ggsave(p_imse_val,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("test_PLS_imseY_", beta_num_to_text(beta_num),".png")  ),
+           width = 12, height = 6 )
+    
+    ggsave(p_imse_val,
+           filename = paste0(list_of_beta_paths[[beta_num]],
+                             paste0("test_PLS_imseY_", beta_num_to_text(beta_num),".pdf")  ),
+           width = 12, height = 6 )
+    
     
     
     for (opt_comp in unique(all_final_res$nComp)) {
@@ -440,7 +469,7 @@ compare_methods_fun <- function(input_folder,
                                       "_ncomp", 
                                       opt_comp,
                                       ".png")  ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       ggsave(p_imse,
              filename = paste0(list_of_beta_paths[[beta_num]],
@@ -449,7 +478,7 @@ compare_methods_fun <- function(input_folder,
                                       "_ncomp", 
                                       opt_comp,
                                       ".pdf")   ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       
       # IMSE on test set Y
@@ -468,21 +497,21 @@ compare_methods_fun <- function(input_folder,
       
       ggsave(p_imse_val,
              filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imseY_", 
+                               paste0("test_imseY_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".png")  ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       ggsave(p_imse_val,
              filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imseY_", 
+                               paste0("test_imseY_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".pdf")   ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       
       
@@ -491,114 +520,12 @@ compare_methods_fun <- function(input_folder,
   
   
   
-  # Disaggregated (original scale and then log)
+  ### Disaggregated (log) -----
   
   for (beta_num in unique(all_final_res$beta.num)) {
     
     
-    # Original scale-------
-    
-    p_cve <- ggplot(all_cves %>% 
-                      filter(beta.num == beta_num,
-                             str_detect(method, "PLS" )),
-                    aes(x = nComp, y = CVE, fill = method)) +
-      geom_boxplot(position=position_dodge(0.8))  +
-      ylab("Training: CVE(Y)") +
-      xlab("# of components") +
-      scale_fill_manual(values = color_codes)+
-      theme_bw()  +
-      theme(legend.position="bottom", text = element_text(size = 20)) +
-      labs(fill = "")
-    
-    
-    ggsave(p_cve,
-           filename = paste0(list_of_beta_paths[[beta_num]],
-                             paste0("train_cveY_", beta_num_to_text(beta_num),".png")  ),
-           width = 8, height = 8 )
-    
-    ggsave(p_cve,
-           filename = paste0(list_of_beta_paths[[beta_num]],
-                             paste0("train_cveY_", beta_num_to_text(beta_num),".pdf")  ),
-           width = 8, height = 8 )
-    
-    
-    for (opt_comp in unique(all_final_res$nComp)) {
-      
-      # IMSE on Beta
-      
-      p_imse <- ggplot(all_final_res %>% 
-                         filter(beta.num == beta_num, 
-                                nComp == opt_comp),
-                       aes(x = method, y = imse, fill = method)) +
-        geom_boxplot(position=position_dodge(0.8)) +
-        ylab( expression( "IMSE(" * beta *")" )  ) +
-        xlab("") +
-        scale_fill_manual(values = color_codes) +
-        theme_bw() +
-        theme(legend.position="none", text = element_text(size = 20))+
-        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components")) 
-      
-      ggsave(p_imse,
-             filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imse_beta_", 
-                                      beta_num_to_text(beta_num), 
-                                      "_ncomp", 
-                                      opt_comp,
-                                      ".png")  ),
-             width = 8, height = 8 )
-      
-      ggsave(p_imse,
-             filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imse_beta_", 
-                                      beta_num_to_text(beta_num), 
-                                      "_ncomp", 
-                                      opt_comp,
-                                      ".pdf")   ),
-             width = 8, height = 8 )
-      
-      
-      # IMSE on test set Y
-      
-      p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
-                                                     nComp == opt_comp),
-                           aes(x = method, y = mean_imse_Y_val, fill = method)) +
-        geom_boxplot(position=position_dodge(0.8)) +
-        ylab( expression( "Test: IMSE(Y)" )  ) +
-        xlab("") +
-        scale_fill_manual(values = color_codes) +
-        theme_bw() +
-        theme(legend.position="none", text = element_text(size = 20)) +
-        labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components"))
-      
-      
-      ggsave(p_imse_val,
-             filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imseY_", 
-                                      beta_num_to_text(beta_num), 
-                                      "_ncomp", 
-                                      opt_comp,
-                                      ".png")  ),
-             width = 8, height = 8 )
-      
-      ggsave(p_imse_val,
-             filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("imseY_", 
-                                      beta_num_to_text(beta_num), 
-                                      "_ncomp", 
-                                      opt_comp,
-                                      ".pdf")   ),
-             width = 8, height = 8 )
-      
-      
-      
-    } # end loop on n components
-    
-    
-    
-    # Log scale-------
-    
-    
-    p_cve <- ggplot(all_cves %>% 
+    p_cve_log <- ggplot(all_cves %>% 
                       filter(beta.num == beta_num,
                              str_detect(method, "PLS" )),
                     aes(x = nComp, y = CVE, fill = method)) +
@@ -612,22 +539,22 @@ compare_methods_fun <- function(input_folder,
       labs(fill = "")
     
     
-    ggsave(p_cve,
+    ggsave(p_cve_log,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("train_log_cveY_", beta_num_to_text(beta_num),".png")  ),
-           width = 8, height = 8 )
+           width = 12, height = 6 )
     
-    ggsave(p_cve,
+    ggsave(p_cve_log,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("train_log_cveY_", beta_num_to_text(beta_num),".pdf")  ),
-           width = 8, height = 8 )
+           width = 12, height = 6 )
     
     
     for (opt_comp in unique(all_final_res$nComp)) {
       
       # IMSE on Beta
       
-      p_imse <- ggplot(all_final_res %>% 
+      p_imse_log <- ggplot(all_final_res %>% 
                          filter(beta.num == beta_num, 
                                 nComp == opt_comp),
                        aes(x = method, y = imse, fill = method)) +
@@ -640,28 +567,28 @@ compare_methods_fun <- function(input_folder,
         theme(legend.position="none", text = element_text(size = 20))+
         labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components")) 
       
-      ggsave(p_imse,
+      ggsave(p_imse_log,
              filename = paste0(list_of_beta_paths[[beta_num]],
                                paste0("log_imse_beta_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".png")  ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
-      ggsave(p_imse,
+      ggsave(p_imse_log,
              filename = paste0(list_of_beta_paths[[beta_num]],
                                paste0("log_imse_beta_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".pdf")   ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       
       # IMSE on test set Y
       
-      p_imse_val <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
+      p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
                                                      nComp == opt_comp),
                            aes(x = method, y = mean_imse_Y_val, fill = method)) +
         geom_boxplot(position=position_dodge(0.8)) +
@@ -674,23 +601,23 @@ compare_methods_fun <- function(input_folder,
         labs(fill = "", subtitle =paste0("PLS methods using ", opt_comp ," components"))
       
       
-      ggsave(p_imse_val,
+      ggsave(p_imse_val_log,
              filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("log_imseY_", 
+                               paste0("log_test_imseY_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".png")  ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
-      ggsave(p_imse_val,
+      ggsave(p_imse_val_log,
              filename = paste0(list_of_beta_paths[[beta_num]],
-                               paste0("log_imseY_", 
+                               paste0("log_test_imseY_", 
                                       beta_num_to_text(beta_num), 
                                       "_ncomp", 
                                       opt_comp,
                                       ".pdf")   ),
-             width = 8, height = 8 )
+             width = 12, height = 6 )
       
       
       
@@ -740,21 +667,21 @@ compare_methods_fun <- function(input_folder,
     ggsave(p_elapsed,
            filename = paste0(out_folder_computation_times,
                              paste0("computaion_times_beta", beta_num,".png")  ),
-           width = 8, height = 6 )
+           width = 12, height = 6 )
     ggsave(p_elapsed,
            filename = paste0(out_folder_computation_times,
                              paste0("computaion_times_beta", beta_num,".pdf")  ),
-           width = 8, height = 6 )
+           width = 12, height = 6 )
     
     
     ggsave(p_elapsed_log,
            filename = paste0(out_folder_computation_times,
                              paste0("log_computaion_times_beta", beta_num,".png")  ),
-           width = 8, height = 6 )
+           width = 12, height = 6 )
     ggsave(p_elapsed_log,
            filename = paste0(out_folder_computation_times,
                              paste0("log_computaion_times_beta", beta_num,".pdf")  ),
-           width = 8, height = 6 )
+           width = 12, height = 6 )
     
     
   } # loop "beta.num"
@@ -1434,6 +1361,244 @@ compare_methods_fun <- function(input_folder,
       
     } # loop beta.num
   } # loop nComp
+  
+  
+  ## 3D beta as 2D -----
+  
+  plot_3D_betas_as_2D <- function(summ_all_betas,
+                                  # df_true_betas,
+                                  beta_num = 99,
+                                  n.Comp = 4,
+                                  path = "3D_beta_plots/",
+                                  theta = 30,   # Angle for viewing (rotation)
+                                  phi = 30) {   # Angle for viewing (tilt)
+    
+    # Ensure the output directory exists
+    if (!dir.exists(path)) {
+      dir.create(path, recursive = TRUE)
+    }
+    
+    
+    # # Define True Beta:
+    # beta_true <- df_true_betas %>% 
+    #   filter(beta.num == beta_num) %>% 
+    #   .[["z"]]
+    # 
+    # x_true <-  df_true_betas %>% 
+    #   filter(method == "True Beta") %>% 
+    #   filter(beta.num == beta_num) %>% 
+    #   .[["p"]] %>% 
+    #   unique()
+    # 
+    # y_true <- df_true_betas %>% 
+    #   filter(method == "True Beta") %>% 
+    #   filter(beta.num == beta_num) %>% 
+    #   .[["q"]] %>% 
+    #   unique()
+    # 
+    # z_true <- beta_true %>% matrix( nrow = length(x_true), ncol = length(y_true) )
+    
+    
+    # Get plot limits out of estimations:
+    betas_limits <- summ_all_betas %>%
+      filter(beta.num == beta_num) %>%
+      ungroup() %>%
+      dplyr::select(mean_z) %>%
+      range()
+    
+    # Restrict to the actual beta we're studying:
+    plot_data <- summ_all_betas %>%
+      filter(beta.num == beta_num, nComp == n.Comp)
+    
+    # Create list of all estimated betas, for all methods:
+    estimated_betas <- list()
+    estimated_betas_matrix <- list()
+    
+    for (unique_method in unique(plot_data[["method"]])) {
+      
+      plot_data_unique_method <- plot_data %>% 
+        filter(method == unique_method)
+      
+      # Get the x and y values out of each estimation
+      x <- plot_data_unique_method %>% 
+        .[["p"]] %>% 
+        unique()
+      
+      y <- plot_data_unique_method %>% 
+        .[["q"]] %>% 
+        unique()
+      
+      # Vectorized:
+      estimated_betas[[unique_method]] <- plot_data_unique_method %>% 
+        .[["mean_z"]]
+      
+      # Matrix form:
+      estimated_betas_matrix[[unique_method]] <- matrix( 
+        estimated_betas[[unique_method]],  
+        nrow = length(x), 
+        ncol = length(y) )
+      
+    }
+    
+    # Get the range of the estimated betas, including truth:
+    # zs_scale <- range(betas_limits, beta_true)
+    zs_scale <- range(betas_limits)
+    
+    # Iterate over each unique method:
+    for (unique_method in names(estimated_betas_matrix)) {
+      
+      x <- plot_data %>% 
+        filter(method == unique_method) %>% 
+        .[["p"]] %>% 
+        unique()
+      
+      y <- plot_data %>% 
+        filter(method == unique_method) %>% 
+        .[["q"]] %>% 
+        unique()
+      
+      # File paths for saving
+      pdf_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".pdf")
+      eps_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".eps")
+      png_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".png")
+      
+      # Save as PDF
+      pdf(pdf_file, width = 7, height = 5)
+      persp(x = x, 
+            y = y, 
+            z = estimated_betas_matrix[[unique_method]], 
+            col = "white",
+            xlab = "p", 
+            ylab = "q", 
+            zlab = "z", 
+            zlim = zs_scale, 
+            theta = theta, 
+            phi = phi,
+            expand = 0.5, 
+            shade = 0.5, 
+            ticktype = "detailed")
+      dev.off()
+      
+      # Save as EPS
+      postscript(eps_file, width = 7, height = 5, horizontal = FALSE, paper = "special")
+      persp(x = x, 
+            y = y, 
+            z = estimated_betas_matrix[[unique_method]], 
+            col = "white",
+            xlab = "p", 
+            ylab = "q", 
+            zlab = "z", 
+            zlim = zs_scale, 
+            theta = theta, 
+            phi = phi,
+            expand = 0.5, 
+            shade = 0.5, 
+            ticktype = "detailed")
+      dev.off()
+      
+      # Save as PNG
+      png(png_file, width = 800, height = 600, res = 100)
+      persp(x = x, 
+            y = y, 
+            z = estimated_betas_matrix[[unique_method]], 
+            col = "white",
+            xlab = "p", 
+            ylab = "q", 
+            zlab = "z", 
+            zlim = zs_scale, 
+            theta = theta, 
+            phi = phi,
+            expand = 0.5, 
+            shade = 0.5, 
+            ticktype = "detailed")
+      dev.off()
+      
+      print(paste("Saved 3D plot for", unique_method, "as PDF, EPS, and PNG."))
+    } # end iterate over each method
+    
+    
+    # # Now plot the True Beta
+    # 
+    # 
+    # # File paths for saving
+    # pdf_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".pdf")
+    # png_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".png")
+    # eps_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".eps")
+    # 
+    # # Save as PDF
+    # pdf(pdf_file, width = 7, height = 5)
+    # persp(x = x_true, 
+    #       y = y_true, 
+    #       z = z_true, 
+    #       col = "white",
+    #       xlab = "p", 
+    #       ylab = "q", 
+    #       zlab = "z", 
+    #       zlim = zs_scale, 
+    #       theta = theta, 
+    #       phi = phi,
+    #       expand = 0.5, 
+    #       shade = 0.5, 
+    #       ticktype = "detailed")
+    # dev.off()
+    # 
+    # # Save as EPS
+    # postscript(eps_file, width = 7, height = 5, horizontal = FALSE, paper = "special")
+    # persp(x = x_true, 
+    #       y = y_true, 
+    #       z = z_true, 
+    #       col = "white",
+    #       xlab = "p", 
+    #       ylab = "q", 
+    #       zlab = "z", 
+    #       zlim = zs_scale, 
+    #       theta = theta, 
+    #       phi = phi,
+    #       expand = 0.5, 
+    #       shade = 0.5, 
+    #       ticktype = "detailed")
+    # dev.off()
+    # 
+    # # Save as PNG
+    # png(png_file, width = 800, height = 600, res = 100)
+    # persp(x = x_true, 
+    #       y = y_true, 
+    #       z = z_true, 
+    #       col = "white",
+    #       xlab = "p", 
+    #       ylab = "q", 
+    #       zlab = "z", 
+    #       zlim = zs_scale, 
+    #       theta = theta, 
+    #       phi = phi,
+    #       expand = 0.5, 
+    #       shade = 0.5, 
+    #       ticktype = "detailed")
+    # dev.off()
+    
+    
+    
+  } # ends function 3D betas as 2D
+  
+  
+  for (n.Comp in unique(summ_all_betas$nComp)) {
+    for (n.Beta in unique(summ_all_betas$beta.num)) {
+      
+      out_folder_mean_betas2 <- paste0(out_folder, "3DBeta2D_", beta_num_to_text(n.Beta), "/")
+      
+      if (!dir.exists(out_folder_mean_betas2)) {
+        dir.create(out_folder_mean_betas2)
+      }
+      
+      plot_3D_betas_as_2D(summ_all_betas,
+                          # df_true_betas,
+                          beta_num = n.Beta,
+                          n.Comp = n.Comp,
+                          path = out_folder_mean_betas2,
+                          theta = 40,  # You can adjust the angle here
+                          phi = 25)
+    }
+  }
   
   
   
