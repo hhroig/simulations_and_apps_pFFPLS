@@ -1,20 +1,43 @@
-list_of_paths = 
-  str_c("results_simulations/",
-        c(
-          "set1_rep30_pen100_K7L7",  
-          "set2_rep30_pen100_K40L40",   
-          "set3_rep30_pen100_K40L40",
-          "set1e_rep30_pen100_K7L7", 
-          "set2e_rep30_pen100_K40L40",  
-          "set3e_rep30_pen100_K40L40"
-        ), 
-        "/")
 
+source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R")
 
+list_subfolder <- c("results_simulations/set1_rep60_pen100_K7L7_/",
+                    "results_simulations/set1e_rep60_pen100_K7L7_/", 
+                    "results_simulations/set3_rep60_pen100_K40L40_/",
+                    "results_simulations/set3e_rep60_pen100_K40L40_/"
+                    )
 
-for (pathito in list_of_paths) {
+for (in_folds in list_subfolder) {
+  print(in_folds)
   
-  compare_methods_fun(input_folder = pathito, 
-                      zoom_r2_lower = 0.5, 
-                      do_rough_r2 = TRUE)
+  compare_methods_fun(in_folds, 
+                      zoom_r2_lower = 0, 
+                      do_rough_r2 = False,
+                      theta = 30,   # Angle for viewing (rotation beta surface)
+                      phi = 30    # Angle for viewing (tilt beta surface)
+  )
+  
 }
+
+
+# input_folder = "results_simulations/set3e_rep60_pen100_K40L40_/"
+# 
+# 
+# source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R")
+# 
+# compare_methods_fun(input_folder, 
+#                                 zoom_r2_lower = 0, 
+#                                 do_rough_r2 = False,
+#                                 theta = 30,   # Angle for viewing (rotation beta surface)
+#                                 phi = 30    # Angle for viewing (tilt beta surface)
+# )
+# 
+# 
+# # 
+# # # -----------------------------------------------------------------------------
+# # 
+# # 
+# zoom_r2_lower = 0
+# do_rough_r2 = FALSE
+# theta = 30   # Angle for viewing (rotation beta surface)
+# phi = 30    # Angle for viewing (tilt beta surface)
