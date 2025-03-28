@@ -27,7 +27,7 @@ compare_methods_fun <- function(input_folder,
                                 do_rough_r2 = TRUE,
                                 theta = 30,   # Angle for viewing (rotation beta surface)
                                 phi = 30    # Angle for viewing (tilt beta surface)
-                                ){
+){
   
   out_folder <- paste0(input_folder, "results_plots/")
   
@@ -107,23 +107,6 @@ compare_methods_fun <- function(input_folder,
   }
   
   
-  
-  # Best number bases for FFPLS:
-  
-  all_best_num_bases_FFPLS <- data.frame()
-  
-  all_best_num_bases_FFPLS_files <- list.files(path = input_folder, pattern = "best_num_bases_FFPLS")
-  
-  for (ind_file in all_best_num_bases_FFPLS_files) {
-    
-    all_best_num_bases_FFPLS <- rbind(
-      all_best_num_bases_FFPLS,
-      readRDS(paste0(input_folder, ind_file))
-    )
-    
-  }
-  
-  
   # Best Lambdas files:
   
   all_best_lambdas <- data.frame()
@@ -172,16 +155,6 @@ compare_methods_fun <- function(input_folder,
   
   all_final_res <- all_final_res %>%
     mutate(nComp = as.factor(nComp))
-  # %>% 
-  #   mutate(
-  #     method = case_when(
-  #       method == "Penalized" ~ "pFFPLS",
-  #       method == "Penalized Ivanescu's" ~ "pFFR_I",
-  #       method == "NonPenalized" ~ "FFPLS",
-  #       method == "NonPenalized (Optimal Bases)" ~ "FFPLS_OB",
-  #       .default = method
-  #     )
-  #   )
   
   all_cves <- all_cves %>%
     mutate(nComp = as.factor(nComp))
@@ -438,7 +411,7 @@ compare_methods_fun <- function(input_folder,
     ggsave(p_cve,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("train_PLS_cveY_", beta_num_to_text(beta_num),".png")  ),
-           width = 12, height = 6 )
+           width = 8, height = 6 )
     
     if (!is.null(dev.list())) dev.off()
     
@@ -446,7 +419,7 @@ compare_methods_fun <- function(input_folder,
     ggsave(p_cve,
            filename = paste0(list_of_beta_paths[[beta_num]],
                              paste0("train_PLS_cveY_", beta_num_to_text(beta_num),".pdf")  ),
-           width = 12, height =6 )
+           width = 8, height =6 )
     
     
     
@@ -572,9 +545,9 @@ compare_methods_fun <- function(input_folder,
     
     
     p_cve_log <- ggplot(all_cves %>% 
-                      filter(beta.num == beta_num,
-                             str_detect(method, "PLS" )),
-                    aes(x = nComp, y = CVE, fill = method)) +
+                          filter(beta.num == beta_num,
+                                 str_detect(method, "PLS" )),
+                        aes(x = nComp, y = CVE, fill = method)) +
       geom_boxplot(position=position_dodge(0.8))  +
       scale_y_log10() +  # Log-10 scale transformation
       ylab("Training: log{CVE(Y)}") +
@@ -607,9 +580,9 @@ compare_methods_fun <- function(input_folder,
       # IMSE on Beta
       
       p_imse_log <- ggplot(all_final_res %>% 
-                         filter(beta.num == beta_num, 
-                                nComp == opt_comp),
-                       aes(x = method, y = imse, fill = method)) +
+                             filter(beta.num == beta_num, 
+                                    nComp == opt_comp),
+                           aes(x = method, y = imse, fill = method)) +
         geom_boxplot(position=position_dodge(0.8)) +
         ylab( expression( " log{ IMSE(" * beta *") }" )  ) +
         xlab("") +
@@ -647,8 +620,8 @@ compare_methods_fun <- function(input_folder,
       # IMSE on test set Y
       
       p_imse_val_log <- ggplot(all_final_res %>% filter( beta.num == beta_num, 
-                                                     nComp == opt_comp),
-                           aes(x = method, y = mean_imse_Y_val, fill = method)) +
+                                                         nComp == opt_comp),
+                               aes(x = method, y = mean_imse_Y_val, fill = method)) +
         geom_boxplot(position=position_dodge(0.8)) +
         ylab( expression( "Test: log { IMSE(Y) }" )  ) +
         scale_y_log10() +  # Log-10 scale transformation
@@ -692,9 +665,6 @@ compare_methods_fun <- function(input_folder,
     
     
   } # end beta loop on original and log scales
-  
-  
-  
   
   
   # Computation time --------------------------------------------------------------
@@ -984,10 +954,10 @@ compare_methods_fun <- function(input_folder,
         
         
         p_r2_partition <- ggplot(summ_all_r2_long %>% 
-                               filter(beta.num == beta_num, 
-                                      nComp == n_comps_loop,
-                                      partition == partition_out),
-                             aes(x = q, y = r2, color = method)) +
+                                   filter(beta.num == beta_num, 
+                                          nComp == n_comps_loop,
+                                          partition == partition_out),
+                                 aes(x = q, y = r2, color = method)) +
           geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
           ylab("R^2") +
           xlab("q") +
@@ -1019,10 +989,10 @@ compare_methods_fun <- function(input_folder,
         # Limit lower ylim for more details:
         
         p_r2_partition_zoom <- ggplot(summ_all_r2_long %>% 
-                                   filter(beta.num == beta_num, 
-                                          nComp == n_comps_loop,
-                                          partition == partition_out),
-                                 aes(x = q, y = r2, color = method)) +
+                                        filter(beta.num == beta_num, 
+                                               nComp == n_comps_loop,
+                                               partition == partition_out),
+                                      aes(x = q, y = r2, color = method)) +
           geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
           ylab("R^2") +
           xlab("q") +
@@ -1268,213 +1238,14 @@ compare_methods_fun <- function(input_folder,
     group_by(method, beta.num, nComp, p, q) %>%
     summarise(mean_z = mean(z))
   
-  # plot_3D_betas <- function(summ_all_betas,
-  #                           df_true_betas,
-  #                           beta_num = 3,
-  #                           n.Comp = 4) {
-  #   
-  #   # Define True Beta:
-  #   beta_true <- df_true_betas %>% 
-  #     filter(beta.num == beta_num) %>% 
-  #     .[["z"]]
-  #   
-  #   x_true <-  df_true_betas %>% 
-  #     filter(method == "True Beta") %>% 
-  #     filter(beta.num == beta_num) %>% 
-  #     .[["p"]] %>% 
-  #     unique()
-  #   
-  #   y_true <- df_true_betas %>% 
-  #     filter(method == "True Beta") %>% 
-  #     filter(beta.num == beta_num) %>% 
-  #     .[["q"]] %>% 
-  #     unique()
-  #   
-  #   z_true <- beta_true %>% matrix( nrow = length(x_true), ncol = length(y_true) )
-  #   
-  #   
-  #   # Get plot limits out of estimations:
-  #   betas_limits <-  summ_all_betas %>%
-  #     filter(beta.num == beta_num) %>%
-  #     ungroup() %>%
-  #     dplyr::select(mean_z) %>%
-  #     range()
-  #   
-  #   # Restrict to the actual beta we're studying:
-  #   plot_data <- summ_all_betas %>%
-  #     filter(beta.num == beta_num, nComp == n.Comp)
-  #   
-  #   
-  #   # Create list of all estimated betas, for all listable methods:
-  #   estimated_betas <- list()
-  #   estimated_betas_matrix <- list()
-  #   
-  #   for (unique_mehtod in  unique(plot_data[["method"]])){
-  #     
-  #     plot_data_unique_method <- plot_data %>% 
-  #       filter(method == unique_mehtod)
-  #     
-  #     # Get the x and y values out of each estimation
-  #     # (might be different for Ivanescu's method)
-  #     x <-  plot_data_unique_method %>% 
-  #       .[["p"]] %>% 
-  #       unique()
-  #     
-  #     y <- plot_data_unique_method %>% 
-  #       .[["q"]] %>% 
-  #       unique()
-  #     
-  #     # Vectorized:
-  #     estimated_betas[[unique_mehtod]] <-plot_data_unique_method %>% 
-  #       .[["mean_z"]]
-  #     
-  #     # Matrix form:
-  #     estimated_betas_matrix[[unique_mehtod]] <- matrix( 
-  #       estimated_betas[[unique_mehtod]],  
-  #       nrow = length(x), 
-  #       ncol = length(y) )
-  #     
-  #   }
-  #   
-  #   
-  #   # Get the range of the estimated betas, including truth:
-  #   zs_scale <- range(estimated_betas, beta_true)
-  #   
-  #   
-  #   # Define the plot axis:
-  #   zaxis <- list( title = list(text="", font = list(size = 30), standoff = 1),
-  #                  nticks = 8,
-  #                  range = zs_scale,
-  #                  # titlefont = list(size = 30),
-  #                  # tickmode = "array",
-  #                  tickfont = list(size = 20)
-  #   )
-  #   xaxis = list(title = list(text="p", font = list(size = 30), standoff = 1),
-  #                # ticktext = month_labels_list, 
-  #                # tickvals = month_breaks_list,
-  #                # tickmode = "array",
-  #                # titlefont = list(size = 30), 
-  #                tickfont = list(size = 20)
-  #   ) 
-  #   yaxis = list(title = list(text="q", font = list(size = 30), standoff = 1),
-  #                # ticktext = month_labels_list, 
-  #                # tickvals = month_breaks_list,
-  #                # tickmode = "array",
-  #                # titlefont = list(size = 30), 
-  #                tickfont = list(size = 20)
-  #   )
-  #   
-  #   
-  #   
-  #   # Create the list of figures:
-  #   figures_list <- list()
-  #   
-  #   # Iterate on each unique method:
-  #   for (unique_mehtod in names(estimated_betas_matrix)) {
-  #     
-  #     x <- plot_data %>% 
-  #       filter(method == unique_mehtod) %>% 
-  #       .[["p"]] %>% 
-  #       unique()
-  #     
-  #     y <- plot_data %>% 
-  #       filter(method == unique_mehtod) %>% 
-  #       .[["p"]] %>% 
-  #       unique()
-  #     
-  #     
-  #     figures_list[[unique_mehtod]] <- plot_ly(x = ~x, 
-  #                                              y = ~y, 
-  #                                              z = ~estimated_betas_matrix[[unique_mehtod]]) %>% 
-  #       add_surface(cmin =  min(zs_scale), cmax = max(zs_scale),
-  #                   showscale = FALSE) %>% 
-  #       layout(  
-  #         scene = list(
-  #           zaxis = zaxis, xaxis = xaxis, yaxis = yaxis,
-  #           aspectratio = list(x=1, y=1, z=1),
-  #           camera = list(eye = list(x = -0.8, y = -1.3 , z = 1.9))) 
-  #       )
-  #     
-  #     
-  #   }
-  #   
-  #   # Finally, add the true beta:
-  #   figures_list[["True_Beta"]] <- plot_ly(x = ~x_true, y = ~y_true, z = ~z_true) %>% 
-  #     add_surface(cmin =  min(zs_scale), cmax = max(zs_scale),
-  #                 showscale = FALSE) %>% 
-  #     layout(  
-  #       scene = list(
-  #         zaxis = zaxis, xaxis = xaxis, yaxis = yaxis,
-  #         aspectratio = list(x=1, y=1, z=1),
-  #         camera = list(eye = list(x = -0.8, y = -1.3 , z = 1.9))) 
-  #     )
-  #   
-  #   
-  #   return(figures_list)
-  #   
-  # }
-  # 
-  # 
-  # 
-  # 
-  # 
-  # 
-  # 
-  # for (n.Comp in unique(summ_all_betas$nComp)) {
-  #   
-  #   for (n.Beta in unique(summ_all_betas$beta.num)) {
-  #     
-  #     out_folder_mean_betas <- paste0(out_folder, "3D", beta_num_to_text(n.Beta), "/")
-  #     
-  #     if (!dir.exists(out_folder_mean_betas)) {
-  #       dir.create(out_folder_mean_betas)
-  #     }
-  #     
-  #     
-  #     figures_list <- plot_3D_betas(summ_all_betas ,
-  #                                   df_true_betas,
-  #                                   beta_num = n.Beta,
-  #                                   n.Comp = n.Comp)
-  #     
-  #     
-  #     
-  #     
-  #     for (fig_to_plot in names(figures_list)) {
-  #       
-  #       print( paste0( "Plotting 3D Beta ", n.Beta,  
-  #                      " for ", n.Comp, " components ",
-  #                      fig_to_plot))
-  #       
-  #       if (!dir.exists(
-  #         paste0(out_folder_mean_betas, "lib/plotly-htmlwidgets-css-2.11.1/")
-  #       )) {
-  #         dir.create(
-  #           paste0(out_folder_mean_betas, "lib/plotly-htmlwidgets-css-2.11.1/")
-  #         )
-  #       }
-  #       
-  #       
-  #       htmlwidgets::saveWidget(
-  #         widget = figures_list[[fig_to_plot]], #the plotly object
-  #         file = paste0(out_folder_mean_betas,
-  #                       fig_to_plot, "_ncomp", n.Comp,
-  #                       ".html"), #the path & file name
-  #         selfcontained = TRUE, #creates a single html file
-  #         libdir = "lib"
-  #       )
-  #       
-  #     }
-  #     
-  #     
-  #   } # loop beta.num
-  # } # loop nComp
+  
   
   
   ## 3D beta as 2D -----
   
   plot_3D_betas_as_2D <- function(summ_all_betas,
-                                  # df_true_betas,
-                                  beta_num = 99,
+                                  df_true_betas,
+                                  beta_num = 1,
                                   n.Comp = 4,
                                   path = "3D_beta_plots/",
                                   theta = 30,   # Angle for viewing (rotation)
@@ -1485,26 +1256,24 @@ compare_methods_fun <- function(input_folder,
       dir.create(path, recursive = TRUE)
     }
     
+    # Define True Beta:
+    beta_true <- df_true_betas %>% 
+      filter(beta.num == beta_num) %>% 
+      .[["z"]]
     
-    # # Define True Beta:
-    # beta_true <- df_true_betas %>% 
-    #   filter(beta.num == beta_num) %>% 
-    #   .[["z"]]
-    # 
-    # x_true <-  df_true_betas %>% 
-    #   filter(method == "True Beta") %>% 
-    #   filter(beta.num == beta_num) %>% 
-    #   .[["p"]] %>% 
-    #   unique()
-    # 
-    # y_true <- df_true_betas %>% 
-    #   filter(method == "True Beta") %>% 
-    #   filter(beta.num == beta_num) %>% 
-    #   .[["q"]] %>% 
-    #   unique()
-    # 
-    # z_true <- beta_true %>% matrix( nrow = length(x_true), ncol = length(y_true) )
+    x_true <-  df_true_betas %>% 
+      filter(method == "True Beta") %>% 
+      filter(beta.num == beta_num) %>% 
+      .[["p"]] %>% 
+      unique()
     
+    y_true <- df_true_betas %>% 
+      filter(method == "True Beta") %>% 
+      filter(beta.num == beta_num) %>% 
+      .[["q"]] %>% 
+      unique()
+    
+    z_true <- beta_true %>% matrix( nrow = length(x_true), ncol = length(y_true) )
     
     # Get plot limits out of estimations:
     betas_limits <- summ_all_betas %>%
@@ -1548,8 +1317,8 @@ compare_methods_fun <- function(input_folder,
     }
     
     # Get the range of the estimated betas, including truth:
-    # zs_scale <- range(betas_limits, beta_true)
-    zs_scale <- range(betas_limits)
+    zs_scale <- range(betas_limits, beta_true)
+    
     
     # Iterate over each unique method:
     for (unique_method in names(estimated_betas_matrix)) {
@@ -1565,26 +1334,26 @@ compare_methods_fun <- function(input_folder,
         unique()
       
       # File paths for saving
-      # pdf_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".pdf")
+      pdf_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".pdf")
       eps_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".eps")
       png_file <- paste0(path, unique_method, "_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".png")
       
       # Save as PDF
-      # pdf(pdf_file, width = 7, height = 5)
-      # persp(x = x, 
-      #       y = y, 
-      #       z = estimated_betas_matrix[[unique_method]], 
-      #       col = "white",
-      #       xlab = "p", 
-      #       ylab = "q", 
-      #       zlab = "z", 
-      #       zlim = zs_scale, 
-      #       theta = theta, 
-      #       phi = phi,
-      #       expand = 0.5, 
-      #       shade = 0.5, 
-      #       ticktype = "detailed")
-      # dev.off()
+      pdf(pdf_file, width = 7, height = 5)
+      persp(x = x,
+            y = y,
+            z = estimated_betas_matrix[[unique_method]],
+            col = "white",
+            xlab = "p",
+            ylab = "q",
+            zlab = "z",
+            zlim = zs_scale,
+            theta = theta,
+            phi = phi,
+            expand = 0.5,
+            shade = 0.5,
+            ticktype = "detailed")
+      dev.off()
       
       # Save as EPS
       postscript(eps_file, width = 7, height = 5, horizontal = FALSE, paper = "special")
@@ -1623,65 +1392,63 @@ compare_methods_fun <- function(input_folder,
       print(paste("Saved 3D plot for", unique_method, "as PDF, EPS, and PNG."))
     } # end iterate over each method
     
+    # Now the true beta
     
-    # # Now plot the True Beta
-    # 
-    # 
-    # # File paths for saving
-    # pdf_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".pdf")
-    # png_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".png")
-    # eps_file <- paste0(path, unique_method, "_betaTrue", "_ncomp", n.Comp, ".eps")
-    # 
-    # # Save as PDF
-    # pdf(pdf_file, width = 7, height = 5)
-    # persp(x = x_true, 
-    #       y = y_true, 
-    #       z = z_true, 
-    #       col = "white",
-    #       xlab = "p", 
-    #       ylab = "q", 
-    #       zlab = "z", 
-    #       zlim = zs_scale, 
-    #       theta = theta, 
-    #       phi = phi,
-    #       expand = 0.5, 
-    #       shade = 0.5, 
-    #       ticktype = "detailed")
-    # dev.off()
-    # 
-    # # Save as EPS
-    # postscript(eps_file, width = 7, height = 5, horizontal = FALSE, paper = "special")
-    # persp(x = x_true, 
-    #       y = y_true, 
-    #       z = z_true, 
-    #       col = "white",
-    #       xlab = "p", 
-    #       ylab = "q", 
-    #       zlab = "z", 
-    #       zlim = zs_scale, 
-    #       theta = theta, 
-    #       phi = phi,
-    #       expand = 0.5, 
-    #       shade = 0.5, 
-    #       ticktype = "detailed")
-    # dev.off()
-    # 
-    # # Save as PNG
-    # png(png_file, width = 800, height = 600, res = 100)
-    # persp(x = x_true, 
-    #       y = y_true, 
-    #       z = z_true, 
-    #       col = "white",
-    #       xlab = "p", 
-    #       ylab = "q", 
-    #       zlab = "z", 
-    #       zlim = zs_scale, 
-    #       theta = theta, 
-    #       phi = phi,
-    #       expand = 0.5, 
-    #       shade = 0.5, 
-    #       ticktype = "detailed")
-    # dev.off()
+    pdf_file <- paste0(path, "True_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".pdf")
+    eps_file <- paste0(path, "True_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".eps")
+    png_file <- paste0(path, "True_beta", beta_num_to_text(beta_num), "_ncomp", n.Comp, ".png")
+    
+    # Save as PDF
+    pdf(pdf_file, width = 7, height = 5)
+    persp(x = x_true,
+          y = y_true,
+          z = z_true,
+          col = "white",
+          xlab = "p",
+          ylab = "q",
+          zlab = "z",
+          zlim = zs_scale,
+          theta = theta,
+          phi = phi,
+          expand = 0.5,
+          shade = 0.5,
+          ticktype = "detailed")
+    dev.off()
+    
+    # Save as EPS
+    postscript(eps_file, width = 7, height = 5, horizontal = FALSE, paper = "special")
+    persp(x = x_true,
+          y = y_true,
+          z = z_true,
+          col = "white",
+          xlab = "p", 
+          ylab = "q", 
+          zlab = "z", 
+          zlim = zs_scale, 
+          theta = theta, 
+          phi = phi,
+          expand = 0.5, 
+          shade = 0.5, 
+          ticktype = "detailed")
+    dev.off()
+    
+    # Save as PNG
+    png(png_file, width = 800, height = 600, res = 100)
+    persp(x = x_true,
+          y = y_true,
+          z = z_true,
+          col = "white",
+          xlab = "p", 
+          ylab = "q", 
+          zlab = "z", 
+          zlim = zs_scale, 
+          theta = theta, 
+          phi = phi,
+          expand = 0.5, 
+          shade = 0.5, 
+          ticktype = "detailed")
+    dev.off()
+    
     
     
     
@@ -1698,7 +1465,7 @@ compare_methods_fun <- function(input_folder,
       }
       
       plot_3D_betas_as_2D(summ_all_betas,
-                          # df_true_betas,
+                          df_true_betas,
                           beta_num = n.Beta,
                           n.Comp = n.Comp,
                           path = out_folder_mean_betas2,
@@ -1706,7 +1473,6 @@ compare_methods_fun <- function(input_folder,
                           phi = 25)
     }
   }
-  
   
   
 }# end function
