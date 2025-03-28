@@ -12,7 +12,7 @@ for (in_folds in list_subfolder) {
   
   compare_methods_fun(in_folds, 
                       zoom_r2_lower = 0, 
-                      do_rough_r2 = False,
+                      do_rough_r2 = F,
                       theta = 30,   # Angle for viewing (rotation beta surface)
                       phi = 30    # Angle for viewing (tilt beta surface)
   )
