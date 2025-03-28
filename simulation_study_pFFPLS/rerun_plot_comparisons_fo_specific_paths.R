@@ -1,11 +1,20 @@
-
 source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R")
 
-list_subfolder <- c("results_simulations/set1_rep60_pen100_K7L7_/",
-                    "results_simulations/set1e_rep60_pen100_K7L7_/", 
-                    "results_simulations/set3_rep60_pen100_K40L40_/",
-                    "results_simulations/set3e_rep60_pen100_K40L40_/"
-                    )
+
+
+list_subfolder <- c(
+  "results/set1_rep60_pen100_K7L7/",
+  "results/set1e_rep60_pen100_K7L7/",
+  "results/set3_rep60_pen100_K40L40/",
+  "results/set3e_rep60_pen100_K40L40/"
+)
+
+
+# list_subfolder <- c(
+#   "results_simulations/set1e_rep30_pen100_K7L7/"
+# )
+
+
 
 for (in_folds in list_subfolder) {
   print(in_folds)
