@@ -14,7 +14,7 @@ beta_num_to_text <- function(beta_num_in) {
   
 }
 
-
+cap_ncomp = 5
 
 
 input_folder = "results_bike/reps100_pen400_K8L8/"
@@ -146,20 +146,20 @@ for (ind_file in all_best_r2_files) {
   
 }
 
-# Betas files:
-
-all_betas <- data.frame()
-
-all_betas_files <- list.files(path = input_folder, pattern = "betas_")
-
-for (ind_file in all_betas_files) {
-  
-  all_betas <- rbind(
-    all_betas,
-    readRDS(paste0(input_folder, ind_file))
-  )
-  
-}
+# # Betas files:
+# 
+# all_betas <- data.frame()
+# 
+# all_betas_files <- list.files(path = input_folder, pattern = "betas_")
+# 
+# for (ind_file in all_betas_files) {
+#   
+#   all_betas <- rbind(
+#     all_betas,
+#     readRDS(paste0(input_folder, ind_file))
+#   )
+#   
+# }
 
 
 # Limit the number of components to plot ----------------------------------
@@ -173,23 +173,28 @@ all_cves <- all_cves %>%
   filter(nComp <= cap_ncomp) %>% 
   mutate(nComp = as.factor(nComp))
 
-all_best_lambdas <- all_best_lambdas %>%
-  filter(nComp <= cap_ncomp) %>% 
-  mutate(nComp = as.factor(nComp)) 
+# all_best_lambdas <- all_best_lambdas %>%
+#   filter(nComp <= cap_ncomp) %>% 
+#   mutate(nComp = as.factor(nComp)) 
+# 
+# all_computation_times <- all_computation_times %>%
+#   filter(nComp <= cap_ncomp) %>% 
+#   mutate(nComp = as.factor(nComp)) 
+# 
+# all_betas <- all_betas %>%
+#   filter(nComp <= cap_ncomp) %>% 
+#   mutate(nComp = as.factor(nComp))
+# 
+# 
+# all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
+#   filter(nComp <= cap_ncomp) %>% 
+#   mutate(nComp = as.factor(nComp)) 
 
-all_computation_times <- all_computation_times %>%
-  filter(nComp <= cap_ncomp) %>% 
-  mutate(nComp = as.factor(nComp)) 
 
-all_betas <- all_betas %>%
-  filter(nComp <= cap_ncomp) %>% 
+
+all_best_r2 <- all_best_r2 %>%
+  filter(nComp <= cap_ncomp) %>%
   mutate(nComp = as.factor(nComp))
-
-
-all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
-  filter(nComp <= cap_ncomp) %>% 
-  mutate(nComp = as.factor(nComp)) 
-
 
 # Limits:
 
@@ -202,10 +207,10 @@ all_best_num_bases_FFPLS <- all_best_num_bases_FFPLS %>%
 # IMSE + MSE --------------------------------------------------------------
 
 
-out_folder_IMSE_CVEs <- paste0(out_folder, "IMSEs_CVEs_specific/")
+out_folder_specific <- paste0(out_folder, "IMSEs_CVEs_specific/")
 
-if (!dir.exists(out_folder_IMSE_CVEs)) {
-  dir.create(out_folder_IMSE_CVEs)
+if (!dir.exists(out_folder_specific)) {
+  dir.create(out_folder_specific)
 }
 
 
@@ -228,7 +233,7 @@ all_final_res_1 <- rbind(all_final_res_ncomp5_no_ffpls, all_final_res_ffpls3)
 
 
 p_imse_val_1 <- ggplot(all_final_res_1 ,
-                     aes(x = method, y = mean_imse_Y_val, fill = method)) +
+                       aes(x = method, y = mean_imse_Y_val, fill = method)) +
   geom_boxplot(position=position_dodge(0.8)) +
   ylab( expression( "Test: IMSE(Y)" )  ) +
   xlab("") +
@@ -240,12 +245,12 @@ p_imse_val_1 <- ggplot(all_final_res_1 ,
 p_imse_val_1
 
 ggsave(p_imse_val_1,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "test_imseY_fig1.png"  ),
        width = 8, height = 8 )
 
 ggsave(p_imse_val_1,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "test_imseY_fig1.pdf" ),
        width = 8, height = 8 )
 
@@ -262,7 +267,7 @@ all_final_res_2 <- all_final_res_1 %>%
 
 
 p_imse_val_2 <- ggplot(all_final_res_2 ,
-                     aes(x = method, y = mean_imse_Y_val, fill = method)) +
+                       aes(x = method, y = mean_imse_Y_val, fill = method)) +
   geom_boxplot(position=position_dodge(0.8)) +
   ylab( expression( "Test: IMSE(Y)" )  ) +
   xlab("") +
@@ -274,12 +279,12 @@ p_imse_val_2 <- ggplot(all_final_res_2 ,
 p_imse_val_2
 
 ggsave(p_imse_val_2,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "test_imseY_fig2.png"  ),
        width = 8, height = 8 )
 
 ggsave(p_imse_val_2,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "test_imseY_fig2.pdf" ),
        width = 8, height = 8 )
 
@@ -295,7 +300,7 @@ all_cves_3 <- all_cves %>%
 
 
 p_cve_3 <- ggplot(all_cves_3,
-                aes(x = nComp, y = CVE, fill = method)) +
+                  aes(x = as.factor(nComp), y = CVE, fill = method)) +
   geom_boxplot(position=position_dodge(0.8))  +
   ylab("Training: CVE(Y)") +
   xlab("# of components") +
@@ -306,11 +311,75 @@ p_cve_3 <- ggplot(all_cves_3,
 
 
 ggsave(p_cve_3,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "train_cveY_fig3.png"  ) ,
        width = 8, height = 8 )
 
 ggsave(p_cve_3,
-       filename = paste0(out_folder_IMSE_CVEs,
+       filename = paste0(out_folder_specific,
                          "train_cveY_fig3.pdf"  ) ,
        width = 8, height = 8 )
+
+
+
+# Plot 4
+# Gráfico R^2 smooth: R2_Training_beta_est_nComp5 (sin el método FFPLS_OB)
+
+
+summ_all_r2 <- all_best_r2 %>%
+  as_tibble() %>%
+  mutate(method = factor(method, levels = c("FFPLS",
+                                            "FFPLS_OB",
+                                            "pFFPLS",
+                                            "pFFR_I",
+                                            "pFFR_RS",
+                                            "True Beta") )) %>%
+  group_by(method, beta.num, nComp, q) %>%
+  summarise(Training = mean(R2_train), Test = mean(R2_val))
+
+summ_all_r2_long <- summ_all_r2 %>%
+  pivot_longer(cols = c(Training, Test),
+               names_to = "partition",
+               values_to = "r2")
+
+
+
+unique(summ_all_r2$nComp)
+unique(summ_all_r2$beta.num)
+unique(summ_all_r2_long$partition)
+
+beta_num = 99
+nComp = 5
+partition_out = "Training"
+
+
+summ_all_r2_long_filtered <- summ_all_r2_long %>% 
+  filter( method != "FFPLS_OB")
+
+p_r2_partition <- ggplot(summ_all_r2_long_filtered %>% 
+                           filter(beta.num == beta_num, 
+                                  nComp == n_comps_loop,
+                                  partition == partition_out),
+                         aes(x = q, y = r2, color = method)) +
+  geom_smooth(se = F, linewidth = 1, alpha = 0.8)  +
+  ylab("R^2") +
+  xlab("q") +
+  scale_color_manual(values = color_codes)+
+  ylim(0, 1) +
+  theme_bw()  +
+  theme(legend.position="bottom", text = element_text(size = 20)) +
+  labs(color = "")
+
+
+ggsave(p_r2_partition,
+       filename = paste0(out_folder_specific,
+                         paste0("R2_", partition_out, 
+                                "_beta_", beta_num_to_text(beta_num), 
+                                "_nComp", n_comps_loop,"_fig4.png")  ),
+       width = 8, height = 6 )
+ggsave(p_r2_partition,
+       filename = paste0(out_folder_specific,
+                         paste0("R2_", partition_out, 
+                                "_beta_", beta_num_to_text(beta_num),
+                                "_nComp", n_comps_loop,"_fig4.pdf")  ),
+       width = 8, height = 6 )
