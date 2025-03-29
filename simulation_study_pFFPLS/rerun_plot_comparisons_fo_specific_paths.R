@@ -10,11 +10,6 @@ list_subfolder <- c(
 )
 
 
-# list_subfolder <- c(
-#   "results_simulations/set1e_rep30_pen100_K7L7/"
-# )
-
-
 
 for (in_folds in list_subfolder) {
   print(in_folds)
