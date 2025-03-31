@@ -16,7 +16,7 @@ main_app_reps_call <- function(
   
   validation_percet = 0.15, # percentage of the data to be used for validation
   
-  center = TRUE, 
+  center = FALSE, 
   
   num_lambdas = 10, # number of lambdas to be used in the grid search (for all)
   
@@ -153,7 +153,6 @@ main_app_reps_call <- function(
 
 data_Rdata_path = "gait_data/gait_orig.RData"
 
-center = FALSE
 
 global_num_lambdas = 10
 global_total_reps = 100
@@ -163,42 +162,6 @@ main_app_reps_call(
   data_Rdata_path = data_Rdata_path,
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
-  
-  center = center,
-  
-  LL =  8, # number of basis for Y(q)
-  KK = 8, # number of basis for X(p)
-  
-  min_basis_for_opt = 7, # minimum number of basis for the optimization process
-  max_basis_for_opt = 40, # maximum number of basis for the optimization process
-  
-  max_nComp = 5 # maximum number of PLS components to compute
-)
-
-
-main_app_reps_call(
-  data_Rdata_path = data_Rdata_path,
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps,
-  
-  center = center,
-  
-  LL =  20, # number of basis for Y(q)
-  KK = 20, # number of basis for X(p)
-  
-  min_basis_for_opt = 7, # minimum number of basis for the optimization process
-  max_basis_for_opt = 40, # maximum number of basis for the optimization process
-  
-  max_nComp = 5 # maximum number of PLS components to compute
-)
-
-
-main_app_reps_call(
-  data_Rdata_path = data_Rdata_path,
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps,
-  
-  center = center,
   
   LL =  40, # number of basis for Y(q)
   KK = 40, # number of basis for X(p)

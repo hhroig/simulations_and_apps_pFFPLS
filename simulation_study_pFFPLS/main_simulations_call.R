@@ -12,13 +12,13 @@ library(doParallel)
 
 main_simulations_call <- function(
     
-  do_setting = 3, # settings 1, 2, or 3
+  do_setting = 1, # settings 1 or 2
   
   X_sd_error = 0, # Extra observation error for X (after data generation)
   
   center = TRUE, 
   
-  num_betas = c(1, 3),  # betas ids
+  num_betas = c(1, 4),  # 1: symmetrical, 2: exponential, 3: monkey saddle, 4: double exponential
   
   num_lambdas = 10, # number of lambdas to be used in the grid search (for all)
   
@@ -71,20 +71,9 @@ main_simulations_call <- function(
   
   
   # # Setting 2: 
-  if (do_setting == 2) {
-    LL <- 40 # number of basis for Y(q)
-    KK <- 40 # number of basis for X(p)
-    do_opt_bases_FFPLS = FALSE
-    
-    # number of PLS components to compute:
-    max_nComp <- 8
-  }
-  
-  
-  # # Setting 3: 
   # # select number of basis using CVE for non-penalized method
   # # use the following for the penalized approach:
-  if (do_setting == 3) {
+  if (do_setting == 2) {
     LL <- 40 # number of basis for Y(q)
     KK <- 40 # number of basis for X(p)
     
@@ -161,15 +150,18 @@ main_simulations_call <- function(
 
 
 global_num_lambdas = 10
-global_total_reps = 60
-global_start_reps = 31
-global_betas = 1:4
+global_total_reps = 100
+global_start_reps = 1
+
+# num_betas = 1:  symmetrical (beta_1 in paper)
+# num_betas = 4: double exponential (beta_2 in paper)
+global_betas = c(1, 4)  
 
 
 # Setting 1:
 main_simulations_call(
   do_setting = 1, 
-  X_sd_error = 0, 
+  X_sd_error = 0, # noiseless predictors
   
   num_betas = global_betas,  # betas ids
   
@@ -177,10 +169,12 @@ main_simulations_call(
   total_reps  = global_total_reps,
   rep_starts = global_start_reps
 )
+
+
 
 main_simulations_call(
   do_setting = 1, 
-  X_sd_error = 0.2, 
+  X_sd_error = 0.2, # noisy predictors
   
   num_betas = global_betas,  # betas ids
   
@@ -190,36 +184,11 @@ main_simulations_call(
 )
 
 
-# 
-# # Setting 2:
-# main_simulations_call(
-#   do_setting = 2, 
-#   X_sd_error = 0, 
-#   
-#   num_betas = global_betas,  # betas ids
-#   
-#   num_lambdas = global_num_lambdas, 
-#   total_reps  = global_total_reps,
-#   rep_starts = global_start_reps
-# )
-# 
-# main_simulations_call(
-#   do_setting = 2, 
-#   X_sd_error = 0.2, 
-#   
-#   num_betas = global_betas,  # betas ids
-#   
-#   num_lambdas = global_num_lambdas, 
-#   total_reps  = global_total_reps,
-#   rep_starts = global_start_reps
-# )
+# Setting 2:
 
-
-
-# Setting 3:
 main_simulations_call(
-  do_setting = 3, 
-  X_sd_error = 0, 
+  do_setting = 2, 
+  X_sd_error = 0, # noiseless predictors
   
   num_betas = global_betas,  # betas ids
   
@@ -228,9 +197,10 @@ main_simulations_call(
   rep_starts = global_start_reps
 )
 
+
 main_simulations_call(
-  do_setting = 3, 
-  X_sd_error = 0.2, 
+  do_setting = 2, 
+  X_sd_error = 0.2,  # noisy predictors
   
   num_betas = global_betas,  # betas ids
   
