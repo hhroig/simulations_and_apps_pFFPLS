@@ -34,3 +34,6 @@ Using `application_gait_data_pFFPLS/` as working directory, source the file: `ma
 Using `application_bike_data_pFFPLS/` as working directory, source the file: `main_app_reps_call.R`. 
 
 
+## Session info
+
+The `sessionInfo()` for the project is stored in `session_info.txt`.
