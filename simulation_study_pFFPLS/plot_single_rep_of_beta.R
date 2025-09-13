@@ -3,7 +3,6 @@ library(gridExtra)
 library(viridis)
 library(ggpubr)
 library(scales)
-library(plotly)
 library(writexl)
 
 
@@ -54,9 +53,22 @@ plot_single_rep_beta <- function(input_folder,
   
   all_betas_files <- list.files(path = input_folder, pattern = "betas_")
   
-  # random sample of reps if provided:
+  # Random sample of reps if provided
+  # (parse rep numbers from filenames e.g. "betas_rep_12_beta_3.Rds" -> rep_num = 12 )
+  rep_nums <- as.integer(sub("^betas_rep_(\\d+)_beta_\\d+\\.Rds$", "\\1",
+                             basename(all_betas_files)))
+  
+  unique_reps <- sort(unique(rep_nums))
+  
   if (!is.null(num_betas_to_plot)) {
-    all_betas_files <- sample(all_betas_files, size = num_betas_to_plot)
+    
+    # sample rep IDs
+    sampled_reps <- sort(sample(unique_reps,
+                                size = min(num_betas_to_plot, length(unique_reps)),
+                                replace = FALSE))
+    
+    all_betas_files <- all_betas_files[rep_nums %in% sampled_reps]
+    
   }
   
   
@@ -80,11 +92,12 @@ plot_single_rep_beta <- function(input_folder,
   
   ## 3D betas ---------------------------
   
+  single_random_rep <- all_betas %>% slice(1) %>% .[["rep_num"]]
   
   
   df_true_betas <- all_betas %>% 
     ungroup() %>% 
-    filter(method == "pFFPLS", nComp == 1, rep_num == 1) %>% 
+    filter(method == "pFFPLS", nComp == 1, rep_num == single_random_rep) %>% 
     mutate(method = "True Beta", z = z_true) %>% 
     dplyr::select(-z_true)
   
@@ -203,7 +216,7 @@ plot_single_rep_beta <- function(input_folder,
       if (!dir.exists(out_each)) dir.create(out_each, recursive = TRUE)
       
       plot_3D_betas_as_2D_each(
-        all_betas = all_betas %>% filter(rep_num < 5),
+        all_betas = all_betas,
         df_true_betas = df_true_betas,
         beta_num = n.Beta,
         n.Comp = n.Comp,
