@@ -139,7 +139,19 @@ main_simulations_call <- function(
   
   source("compare_methods_fofr_with_ivanescu_ramsay_silverman.R", local = TRUE)
   
-  compare_methods_fun(input_folder = out_folder)
+  compare_methods_fun(input_folder = out_folder, do_mean_betas = FALSE)
+  
+  
+  # Plot single reps comparisons ---------------------------------------------
+  
+  source("plot_single_rep_of_beta.R", local = TRUE)
+  
+  plot_single_rep_beta(out_folder, 
+                       theta = 30,   # Angle for viewing (rotation beta surface)
+                       phi = 30,    # Angle for viewing (tilt beta surface)
+                       num_betas_to_plot = NULL,  # if NULL compute the samples that result in lowest IMSE
+                       target_betas = c(1, 4),
+                       target_nComp = c(2, 3,5, 6) )
   
   
 }
@@ -150,7 +162,7 @@ main_simulations_call <- function(
 
 
 global_num_lambdas = 10
-global_total_reps = 100
+global_total_reps = 30
 global_start_reps = 1
 
 # num_betas = 1:  symmetrical (beta_1 in paper)
@@ -158,33 +170,38 @@ global_start_reps = 1
 global_betas = c(1, 4)  
 
 
-# Setting 1:
-main_simulations_call(
-  do_setting = 1, 
-  X_sd_error = 0, # noiseless predictors
-  
-  num_betas = global_betas,  # betas ids
-  
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps,
-  rep_starts = global_start_reps
-)
-
-
-
-main_simulations_call(
-  do_setting = 1, 
-  X_sd_error = 0.2, # noisy predictors
-  
-  num_betas = global_betas,  # betas ids
-  
-  num_lambdas = global_num_lambdas, 
-  total_reps  = global_total_reps,
-  rep_starts = global_start_reps
-)
+# # Setting 1:
+# main_simulations_call(
+#   do_setting = 1, 
+#   X_sd_error = 0, # noiseless predictors
+#   
+#   num_betas = global_betas,  # betas ids
+#   
+#   num_lambdas = global_num_lambdas, 
+#   total_reps  = global_total_reps,
+#   rep_starts = global_start_reps
+# )
+# 
+# 
+# 
+# main_simulations_call(
+#   do_setting = 1, 
+#   X_sd_error = 0.2, # noisy predictors
+#   
+#   num_betas = global_betas,  # betas ids
+#   
+#   num_lambdas = global_num_lambdas, 
+#   total_reps  = global_total_reps,
+#   rep_starts = global_start_reps
+# )
 
 
 # Setting 2:
+
+
+lower_penalty_bound = 11
+upper_penalty_bound = 12
+
 
 main_simulations_call(
   do_setting = 2, 
@@ -194,7 +211,10 @@ main_simulations_call(
   
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
-  rep_starts = global_start_reps
+  rep_starts = global_start_reps,
+  
+  lower_penalty_bound = lower_penalty_bound, # lower bound for the penalty grid search in the proposed method
+  upper_penalty_bound = upper_penalty_bound, # upper bound for the penalty grid search in the proposed method
 )
 
 
@@ -206,5 +226,8 @@ main_simulations_call(
   
   num_lambdas = global_num_lambdas, 
   total_reps  = global_total_reps,
-  rep_starts = global_start_reps
+  rep_starts = global_start_reps,
+  
+  lower_penalty_bound = lower_penalty_bound, # lower bound for the penalty grid search in the proposed method
+  upper_penalty_bound = upper_penalty_bound, # upper bound for the penalty grid search in the proposed method
 )
